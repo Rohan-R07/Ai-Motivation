@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChatHistoryState">
+    <option name="chatSessions" value="{&quot;0952d716-3c54-4739-81ca-262c95dba3c5&quot;:{&quot;id&quot;:&quot;0952d716-3c54-4739-81ca-262c95dba3c5&quot;,&quot;name&quot;:&quot;A Friendly Hello&quot;,&quot;timestamp&quot;:1765802146563,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;hello&quot;}],&quot;context&quot;:[]},{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;create a new column with colour red&quot;}],&quot;context&quot;:[]}],&quot;draft_message&quot;:&quot;create a new column with colour red&quot;},&quot;097c7390-0bb7-4349-ab4f-12e61273c5d8&quot;:{&quot;id&quot;:&quot;097c7390-0bb7-4349-ab4f-12e61273c5d8&quot;,&quot;name&quot;:&quot;New Chat&quot;,&quot;timestamp&quot;:1766203792045,&quot;messages&quot;:[]}}" />
+  </component>
+</project>
