@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Icon
@@ -34,28 +35,175 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+//
+//
+//@Composable
+//fun UserAndPasswardTextField(
+//    placeholder: String = "",
+//    label: String = "",
+//    value: String,
+//    onvalueChange: (String) -> Unit,
+//    modifier: Modifier = Modifier,
+//    isPassword: Boolean = false
+//) {
+//    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+//
+//
+//    val usernameRegex = remember {
+//        Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+//    }
+//
+//    val isValid = remember(value) {
+//        if (isPassword) {
+//            value.length >= 6 // basic password rule
+//        } else {
+//            value.length >= 3 &&
+//                    Regex("^[a-zA-Z0-9._]{3,20}$").matches(value)
+//        }
+//    }
+//
+//    OutlinedTextField(
+//        modifier = modifier.fillMaxWidth(),
+//        shape = RoundedCornerShape(10.dp),
+//        value = value,
+//
+//        onValueChange = { newValue ->
+//            if (!isPassword) {
+////                if (newValue.contains(" ")) return@TextField
+//                if (!usernameRegex.matches(newValue)) return@OutlinedTextField
+//            }
+//            onvalueChange(newValue)
+//        },
+//
+//        label = {
+//            Text(
+//                label,
+//                color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 15.sp
+//            )
+//        },
+//
+//        placeholder = {
+//            Text(
+//                placeholder,
+//                color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 13.sp
+//            )
+//        },
+//
+//        leadingIcon = {
+//            Icon(
+//                imageVector =
+//                    if (isPassword) Icons.Filled.Lock else Icons.Filled.Person,
+//                contentDescription = null,
+//                tint = MaterialTheme.colorScheme.primary,
+//                modifier = Modifier.size(20.dp)
+//            )
+//        },
+//
+//        // 👇 Password masking logic
+//        visualTransformation =
+//            if (isPassword && !passwordVisible)
+//                PasswordVisualTransformation()
+//            else
+//                VisualTransformation.None,
+//
+//        // 👇 Combined trailing icons (clear + eye)
+//        trailingIcon = {
+//            Row {
+//                if (value.isNotEmpty()) {
+//                    IconButton(onClick = { onvalueChange("") }) {
+//                        Icon(
+//                            imageVector = Icons.Default.Clear,
+//                            contentDescription = "Clear",
+//                            tint = MaterialTheme.colorScheme.error
+//                        )
+//                    }
+//                }
+//
+//                if (isPassword) {
+//                    IconButton(
+//                        onClick = { passwordVisible = !passwordVisible }
+//                    ) {
+//                        Icon(
+//                            imageVector =
+//                                if (passwordVisible)
+//                                    Icons.Default.VisibilityOff
+//                                else
+//                                    Icons.Default.Visibility,
+//                            contentDescription = "Toggle password",
+//                            tint = MaterialTheme.colorScheme.primary
+//                        )
+//                    }
+//                }
+//            }
+//        },
+//
+//        singleLine = true,
+//
+//        isError = value.isNotEmpty() && !isValid,
+//
+//        supportingText = {
+//            if (value.isNotEmpty() && !isValid) {
+//                Text(
+//                    text =
+//                        if (isPassword)
+//                            "Minimum 6 characters"
+//                        else
+//                            "3–20 characters • letters, numbers, . or _",
+//                    color = MaterialTheme.colorScheme.error
+//                )
+//            }
+//        },
+//
+//        keyboardOptions = KeyboardOptions(
+//            keyboardType =
+//                if (isPassword)
+//                    KeyboardType.Password
+//                else
+//                    KeyboardType.Ascii,
+//            imeAction = ImeAction.Next,
+//            capitalization = KeyboardCapitalization.None
+//        ),
+//
+//        colors = OutlinedTextFieldDefaults.colors(
+////            focusedIndicatorColor = MaterialTheme.colorScheme.background,
+////            unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
+////            unfocusedContainerColor =
+////                MaterialTheme.colorScheme.surfaceVariant
+//
+//            focusedBorderColor = MaterialTheme.colorScheme.primary,
+//            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+//
+//            )
+//    )
+//}
 
 
 @Composable
 fun UserAndPasswardTextField(
     placeholder: String = "",
-    label:String = "",
+    label: String = "",
     value: String,
     onvalueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isEmail: Boolean = false
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-    val usernameRegex = remember {
-        Regex("^[a-zA-Z0-9._]{0,20}$")
-    }
-
+    // ✅ Validation logic ONLY (no blocking input)
     val isValid = remember(value) {
-        if (isPassword) {
-            value.length >= 6 // basic password rule
-        } else {
-            value.length >= 3 &&
+        when {
+            isPassword -> value.length <= 6
+
+            isEmail -> android.util.Patterns.EMAIL_ADDRESS
+                .matcher(value)
+                .matches()
+
+            else -> value.length >= 3 &&
                     Regex("^[a-zA-Z0-9._]{3,20}$").matches(value)
         }
     }
@@ -65,17 +213,14 @@ fun UserAndPasswardTextField(
         shape = RoundedCornerShape(10.dp),
         value = value,
 
+        // ✅ DO NOT BLOCK INPUT
         onValueChange = { newValue ->
-            if (!isPassword) {
-//                if (newValue.contains(" ")) return@TextField
-                if (!usernameRegex.matches(newValue)) return@OutlinedTextField
-            }
             onvalueChange(newValue)
         },
 
         label = {
             Text(
-                 label,
+                label,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
@@ -84,7 +229,7 @@ fun UserAndPasswardTextField(
 
         placeholder = {
             Text(
-                 placeholder,
+                placeholder,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp
@@ -94,21 +239,23 @@ fun UserAndPasswardTextField(
         leadingIcon = {
             Icon(
                 imageVector =
-                    if (isPassword) Icons.Filled.Lock else Icons.Filled.Person,
+                    when {
+                        isPassword -> Icons.Filled.Lock
+                        isEmail -> Icons.Filled.Mail
+                        else -> Icons.Filled.Person
+                    },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
         },
 
-        // 👇 Password masking logic
         visualTransformation =
             if (isPassword && !passwordVisible)
                 PasswordVisualTransformation()
             else
                 VisualTransformation.None,
 
-        // 👇 Combined trailing icons (clear + eye)
         trailingIcon = {
             Row {
                 if (value.isNotEmpty()) {
@@ -141,40 +288,47 @@ fun UserAndPasswardTextField(
 
         singleLine = true,
 
-        isError = value.isNotEmpty() && !isValid,
+        isError = value.isNotEmpty() && isValid,
+
+//        supportingText = {
+//            if (value.isNotEmpty() && !isValid) {
+//                Text(
+//                    text = when {
+//                        isPassword -> "Minimum 6 characters"
+//                        isEmail -> "Enter a valid email"
+//                        else -> "3–20 chars • letters, numbers, . or _"
+//                    },
+//                    color = MaterialTheme.colorScheme.error
+//                )
+//            }
+//        },
 
         supportingText = {
-            if (value.isNotEmpty() && !isValid) {
+            if (value.isNotEmpty() && isValid) {
                 Text(
-                    text =
-                        if (isPassword)
-                            "Minimum 6 characters"
-                        else
-                            "3–20 characters • letters, numbers, . or _",
+                    text = when {
+                        isPassword -> "Minimum 6 characters"
+                        isEmail -> "Enter a valid email address"
+                        else -> "3–20 chars • letters, numbers, . or _"
+                    },
                     color = MaterialTheme.colorScheme.error
                 )
             }
         },
 
         keyboardOptions = KeyboardOptions(
-            keyboardType =
-                if (isPassword)
-                    KeyboardType.Password
-                else
-                    KeyboardType.Ascii,
+            keyboardType = when {
+                isPassword -> KeyboardType.Password
+                isEmail -> KeyboardType.Email
+                else -> KeyboardType.Text
+            },
             imeAction = ImeAction.Next,
             capitalization = KeyboardCapitalization.None
         ),
 
         colors = OutlinedTextFieldDefaults.colors(
-//            focusedIndicatorColor = MaterialTheme.colorScheme.background,
-//            unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
-//            unfocusedContainerColor =
-//                MaterialTheme.colorScheme.surfaceVariant
-
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
-
         )
     )
 }

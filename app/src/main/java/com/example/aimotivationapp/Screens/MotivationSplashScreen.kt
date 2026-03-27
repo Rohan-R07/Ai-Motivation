@@ -1,9 +1,6 @@
 package com.example.aimotivationapp.Screens
 
-import android.widget.Toast
-import androidx.activity.compose.ReportDrawn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,24 +8,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aimotivationapp.MainNavigation.LoginScreen
+import com.example.aimotivationapp.MainNavigation.SplashScreen
+import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun MotivationSplashScreen(modifier: Modifier = Modifier) {
+fun MotivationSplashScreen(mainNavBackStack: SnapshotStateList<Any>) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val firebaseAuth = FirebaseAuth.getInstance()
 
     Column(
         modifier = Modifier
@@ -38,11 +43,7 @@ fun MotivationSplashScreen(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
 
-    ) {
-
-        var clickableState = remember {
-            mutableStateOf(false)
-        }
+        ) {
 
         Text(
             "Motivation",
@@ -51,27 +52,29 @@ fun MotivationSplashScreen(modifier: Modifier = Modifier) {
             fontStyle = FontStyle.Normal,
             modifier = Modifier
                 .clip(RoundedCornerShape(40.dp))
-                .clickable{
-                clickableState.value = !clickableState.value
-            }
-
-
         )
 
+    }
+//
+    val isUserLoggedIn = firebaseAuth.currentUser != null
+    LaunchedEffect(Unit) {
 
-        if (clickableState.value){
-            Toast.makeText(LocalContext.current,"Pressed the button",Toast.LENGTH_SHORT).show()
+        coroutineScope.launch {
+            delay(1000)
+
+
+            if (isUserLoggedIn) {
+
+                mainNavBackStack.add(TeamHeadScreen)
+                mainNavBackStack.remove(SplashScreen)
+            } else {
+
+                mainNavBackStack.add(LoginScreen)
+                mainNavBackStack.remove(SplashScreen)
+            }
         }
-
     }
 
-}
-
-
-@Preview
-@Composable
-private fun OIFJEIFO() {
-
-    MotivationSplashScreen()
 
 }
+
