@@ -44,11 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aimotivationapp.Screens.HomeScreens.MotivationTone
 
-//import androidx.compose.ui.unit.sp
-//
-//
-
-
 @Composable
 fun MotivationCard(motivation: RecentMotivation) {
     val colorScheme = MaterialTheme.colorScheme
@@ -79,7 +74,7 @@ fun MotivationCard(motivation: RecentMotivation) {
         val shareText = buildString {
             append("${motivation.emoji} ${motivation.tone} message for ${motivation.team}\n\n")
             append("\"${motivation.message}\"\n\n")
-            append("— Sent via TeamLead App")
+            append("— Sent via Ai Motivation App")
         }
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
@@ -108,7 +103,12 @@ fun MotivationCard(motivation: RecentMotivation) {
                         Brush.horizontalGradient(
                             colors = listOf(accentPrimary, accentPrimary.copy(alpha = 0.3f)),
                         )
-                    ),
+                    )
+                    .clickable{
+
+                        // TODO Navigate to the Create motivation screen
+
+                    },
             )
 
             Column(modifier = Modifier.padding(18.dp)) {
