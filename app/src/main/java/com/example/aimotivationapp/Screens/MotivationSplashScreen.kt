@@ -28,53 +28,347 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@Composable
-fun MotivationSplashScreen(mainNavBackStack: SnapshotStateList<Any>) {
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+
+//@Composable
+//fun MotivationSplashScreen(
+//    mainNavBackStack: SnapshotStateList<Any>
+//) {
+//    val colorScheme = MaterialTheme.colorScheme
+//    val coroutineScope = rememberCoroutineScope()
+//
+//    var startAnimation by remember { mutableStateOf(false) }
+//
+//    // Simple fade in only
+//    val alpha by animateFloatAsState(
+//        targetValue = if (startAnimation) 1f else 0f,
+//        animationSpec = tween(
+//            durationMillis = 600,
+//            easing = EaseInOutSine
+//        ),
+//        label = "alpha"
+//    )
+//
+//    // Subtle progress at bottom
+//    val progressAlpha by animateFloatAsState(
+//        targetValue = if (startAnimation) 1f else 0f,
+//        animationSpec = tween(
+//            durationMillis = 400,
+//            delayMillis = 800
+//        ),
+//        label = "progressAlpha"
+//    )
+//
+//    // ─── Launch & Navigate ───────────────────────────────────────
+//    LaunchedEffect(Unit) {
+//        startAnimation = true
+//        delay(3500)
+//
+//        val firebaseAuth = FirebaseAuth.getInstance()
+//        val isUserLoggedIn = firebaseAuth.currentUser != null
+//
+//        coroutineScope.launch {
+//            delay(1000)
+//            if (isUserLoggedIn) {
+//                mainNavBackStack.add(TeamHeadScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//            } else {
+//                mainNavBackStack.add(LoginScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//            }
+//        }
+//    }
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(colorScheme.background),
+//        contentAlignment = Alignment.Center
+//    ) {
+//
+//        // ── Center Logo + Name ────────────────────────────────────
+//        Column(
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center,
+//            modifier = Modifier.alpha(alpha)
+//        ) {
+//
+//            // ── Logo Placeholder ──────────────────────────────────
+//            // Replace this Box with your Image() composable
+//            Box(
+//                contentAlignment = Alignment.Center,
+//                modifier = Modifier
+//                    .size(72.dp)
+//                    .background(
+//                        color = colorScheme.primaryContainer,
+//                        shape = RoundedCornerShape(20.dp)
+//                    )
+//            ) {
+//                // TODO: Replace with your logo
+//                // Image(
+//                //     painter = painterResource(id = R.drawable.your_logo),
+//                //     contentDescription = "App Logo",
+//                //     modifier = Modifier.size(72.dp)
+//                // )
+//                Text(
+//                    text = "M",
+//                    style = MaterialTheme.typography.headlineLarge.copy(
+//                        color = colorScheme.primary,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 32.sp
+//                    )
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            // ── App Name ──────────────────────────────────────────
+//            Text(
+//                text = "MotivateAI",
+//                style = MaterialTheme.typography.titleLarge.copy(
+//                    color = colorScheme.onBackground,
+//                    fontWeight = FontWeight.SemiBold,
+//                    fontSize = 22.sp,
+//                    letterSpacing = 0.2.sp
+//                )
+//            )
+//
+//            Spacer(modifier = Modifier.height(4.dp))
+//
+//            // ── Tagline ───────────────────────────────────────────
+//            Text(
+//                text = "Your Personal AI Coach",
+//                style = MaterialTheme.typography.bodySmall.copy(
+//                    color = colorScheme.onSurface.copy(alpha = 0.45f),
+//                    fontWeight = FontWeight.Normal,
+//                    letterSpacing = 0.2.sp
+//                )
+//            )
+//        }
+//
+//        // ── Bottom: Progress + Version ────────────────────────────
+//        Column(
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .padding(bottom = 40.dp)
+//                .alpha(progressAlpha)
+//        ) {
+//            LinearProgressIndicator(
+//                modifier = Modifier
+//                    .width(48.dp)
+//                    .height(2.dp)
+//                    .clip(RoundedCornerShape(50)),
+//                color = colorScheme.primary,
+//                trackColor = colorScheme.surfaceVariant
+//            )
+//        }
+//    }
+//}
+
+@Composable
+fun MotivationSplashScreen(
+    mainNavBackStack: SnapshotStateList<Any>
+) {
+    val colorScheme = MaterialTheme.colorScheme
     val coroutineScope = rememberCoroutineScope()
 
-    val firebaseAuth = FirebaseAuth.getInstance()
+    var startAnimation by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Red)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+    // Simple fade in
+    val alpha by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 700,
+            easing = EaseInOutSine
+        ),
+        label = "alpha"
+    )
 
-        ) {
+    // Text fade in slightly after logo
+    val textAlpha by animateFloatAsState(
+        targetValue = if (startAnimation) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 600,
+            delayMillis = 400,
+            easing = EaseInOutSine
+        ),
+        label = "textAlpha"
+    )
 
-        Text(
-            "Motivation",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            fontStyle = FontStyle.Normal,
-            modifier = Modifier
-                .clip(RoundedCornerShape(40.dp))
-        )
+    // ─── Infinite logo animation ─────────────────────────────────
+    val infiniteTransition = rememberInfiniteTransition(label = "logoAnim")
 
-    }
-//
-    val isUserLoggedIn = firebaseAuth.currentUser != null
+    // Soft scale breathe — like iOS app icons loading
+    val logoScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "logoScale"
+    )
+
+    // Corner radius morphing — squircle to rounded
+    val cornerRadius by infiniteTransition.animateFloat(
+        initialValue = 20f,
+        targetValue = 28f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "cornerMorph"
+    )
+
+    // Soft glow alpha behind logo
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.15f,
+        targetValue = 0.35f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glowAlpha"
+    )
+
+    // ─── Launch & Navigate ───────────────────────────────────────
     LaunchedEffect(Unit) {
+        startAnimation = true
+//        delay(3500)
+
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val isUserLoggedIn = firebaseAuth.currentUser != null
 
         coroutineScope.launch {
-            delay(1000)
-
-
+            delay(1200)
             if (isUserLoggedIn) {
-
                 mainNavBackStack.add(TeamHeadScreen)
                 mainNavBackStack.remove(SplashScreen)
             } else {
-
                 mainNavBackStack.add(LoginScreen)
                 mainNavBackStack.remove(SplashScreen)
             }
         }
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
 
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.alpha(alpha)
+        ) {
+
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                // Soft glow behind logo
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .scale(logoScale)
+                        .background(
+                            color = colorScheme.primary.copy(alpha = glowAlpha),
+                            shape = RoundedCornerShape(cornerRadius.dp)
+                        )
+                        .blur(16.dp)
+                )
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .scale(logoScale)
+                        .background(
+                            color = colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(cornerRadius.dp)
+                        )
+                ) {
+                    // ─────────────────────────────────────────────
+                    // TODO: Replace Text with your logo Image below
+                    // ─────────────────────────────────────────────
+                    // Image(
+                    //     painter = painterResource(R.drawable.ic_your_logo),
+                    //     contentDescription = null,
+                    //     modifier = Modifier.size(44.dp)
+                    // )
+                    // ─────────────────────────────────────────────
+                    Text(
+                        text = "M",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            color = colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 32.sp
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.alpha(textAlpha)
+            ) {
+                Text(
+                    text = "Motivato",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = colorScheme.onBackground,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 22.sp,
+                        letterSpacing = 0.2.sp
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Motivate Your Team... :)",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = colorScheme.onSurface.copy(alpha = 0.45f),
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 0.2.sp
+                    )
+                )
+            }
+        }
+
+
+    }
 }
-
