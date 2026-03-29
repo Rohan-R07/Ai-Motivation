@@ -101,7 +101,7 @@ fun LoginPotrait(
     val theEnterValue = viewModel.userName.collectAsState().value.toString()
 
 
-    Log.d("adding LoginScreen",theEnterValue)
+//    Log.d("adding LoginScreen",theEnterValue)
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -381,7 +381,7 @@ fun LoginPotrait(
                                                         )
                                                     }
 
-                                                    mainBackStack.add(TeamHeadScreen)
+                                                    mainBackStack.add(UserCheckingScreen)
                                                     mainBackStack.remove(LoginScreen)
                                                     registerLoading.value = false
 
