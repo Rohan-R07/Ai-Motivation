@@ -155,38 +155,39 @@ fun MotivationSplashScreen(
     // ─── Launch & Navigate ───────────────────────────────────────
     LaunchedEffect(Unit) {
         startAnimation = true
-
+        Log.d("SplashScreen", "USer Logged In $theEnterValue")
         delay(1000)
         val isthEnterValueTrue = theEnterValue == "null" // is Empty
-        Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $isthEnterValueTrue")
+        Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $theEnterValue")
         coroutineScope.launch {
-            delay(1200)
+
+            delay(3000)
 
 
-            if (isUserLoggedIn) {
-                if (theEnterValue.isEmpty()) {
-                    mainNavBackStack.add(UserCheckingScreen)
-                    mainNavBackStack.remove(SplashScreen)
-                } else {
-                    mainNavBackStack.add(TeamHeadScreen)
-                    mainNavBackStack.remove(SplashScreen)
-                }
-
-            } else {
-                mainNavBackStack.add(LoginScreen)
-                mainNavBackStack.remove(SplashScreen)
-            }
-
-
-//            if (isUserLoggedIn){
-//                mainNavBackStack.add(TeamHeadScreen)
-//                mainNavBackStack.remove(SplashScreen)
+//            if (isUserLoggedIn) {
+//                if (theEnterValue.isEmpty()) {
+//                    mainNavBackStack.add(UserCheckingScreen)
+//                    mainNavBackStack.remove(SplashScreen)
+//                } else {
+//                    mainNavBackStack.add(TeamHeadScreen)
+//                    mainNavBackStack.remove(SplashScreen)
+//                }
 //
-//            }
-//            else{
+//            } else {
 //                mainNavBackStack.add(LoginScreen)
 //                mainNavBackStack.remove(SplashScreen)
 //            }
+
+
+            if (isUserLoggedIn){
+                mainNavBackStack.add(TeamHeadScreen)
+                mainNavBackStack.remove(SplashScreen)
+
+            }
+            else{
+                mainNavBackStack.add(UserCheckingScreen)
+                mainNavBackStack.remove(SplashScreen)
+            }
 
         }
     }

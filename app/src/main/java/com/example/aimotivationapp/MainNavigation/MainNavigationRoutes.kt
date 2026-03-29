@@ -6,19 +6,22 @@ import kotlinx.serialization.Serializable
 //@Serializable
 //sealed interface MainNavigationRoutes : NavKey{
 
-    @Serializable
-    data object SplashScreen
+@Serializable
+data object SplashScreen
 
-    @Serializable
-    data object TeamHeadScreen
+@Serializable
+data object TeamHeadScreen
 
-    @Serializable
-    data object FacultyScreen
+@Serializable
+data object FacultyScreen
 
-    @Serializable
-    data object LoginScreen
+@Serializable
+data object LoginScreen
 
-    @Serializable
-    data object UserCheckingScreen
+@Serializable
+data object UserCheckingScreen
+
+@Serializable
+data object TeamHeadLoginScreen
 
 //}
