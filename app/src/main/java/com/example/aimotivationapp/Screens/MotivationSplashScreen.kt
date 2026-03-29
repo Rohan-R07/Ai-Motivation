@@ -1,5 +1,6 @@
 package com.example.aimotivationapp.Screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -54,152 +55,36 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
+import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
+import com.example.aimotivationapp.Datastore.UserPreferences
+import com.example.aimotivationapp.Datastore.UserRepository
+import com.example.aimotivationapp.MainNavigation.UserCheckingScreen
 import kotlinx.coroutines.delay
-
-//@Composable
-//fun MotivationSplashScreen(
-//    mainNavBackStack: SnapshotStateList<Any>
-//) {
-//    val colorScheme = MaterialTheme.colorScheme
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    var startAnimation by remember { mutableStateOf(false) }
-//
-//    // Simple fade in only
-//    val alpha by animateFloatAsState(
-//        targetValue = if (startAnimation) 1f else 0f,
-//        animationSpec = tween(
-//            durationMillis = 600,
-//            easing = EaseInOutSine
-//        ),
-//        label = "alpha"
-//    )
-//
-//    // Subtle progress at bottom
-//    val progressAlpha by animateFloatAsState(
-//        targetValue = if (startAnimation) 1f else 0f,
-//        animationSpec = tween(
-//            durationMillis = 400,
-//            delayMillis = 800
-//        ),
-//        label = "progressAlpha"
-//    )
-//
-//    // ─── Launch & Navigate ───────────────────────────────────────
-//    LaunchedEffect(Unit) {
-//        startAnimation = true
-//        delay(3500)
-//
-//        val firebaseAuth = FirebaseAuth.getInstance()
-//        val isUserLoggedIn = firebaseAuth.currentUser != null
-//
-//        coroutineScope.launch {
-//            delay(1000)
-//            if (isUserLoggedIn) {
-//                mainNavBackStack.add(TeamHeadScreen)
-//                mainNavBackStack.remove(SplashScreen)
-//            } else {
-//                mainNavBackStack.add(LoginScreen)
-//                mainNavBackStack.remove(SplashScreen)
-//            }
-//        }
-//    }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(colorScheme.background),
-//        contentAlignment = Alignment.Center
-//    ) {
-//
-//        // ── Center Logo + Name ────────────────────────────────────
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center,
-//            modifier = Modifier.alpha(alpha)
-//        ) {
-//
-//            // ── Logo Placeholder ──────────────────────────────────
-//            // Replace this Box with your Image() composable
-//            Box(
-//                contentAlignment = Alignment.Center,
-//                modifier = Modifier
-//                    .size(72.dp)
-//                    .background(
-//                        color = colorScheme.primaryContainer,
-//                        shape = RoundedCornerShape(20.dp)
-//                    )
-//            ) {
-//                // TODO: Replace with your logo
-//                // Image(
-//                //     painter = painterResource(id = R.drawable.your_logo),
-//                //     contentDescription = "App Logo",
-//                //     modifier = Modifier.size(72.dp)
-//                // )
-//                Text(
-//                    text = "M",
-//                    style = MaterialTheme.typography.headlineLarge.copy(
-//                        color = colorScheme.primary,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 32.sp
-//                    )
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // ── App Name ──────────────────────────────────────────
-//            Text(
-//                text = "MotivateAI",
-//                style = MaterialTheme.typography.titleLarge.copy(
-//                    color = colorScheme.onBackground,
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 22.sp,
-//                    letterSpacing = 0.2.sp
-//                )
-//            )
-//
-//            Spacer(modifier = Modifier.height(4.dp))
-//
-//            // ── Tagline ───────────────────────────────────────────
-//            Text(
-//                text = "Your Personal AI Coach",
-//                style = MaterialTheme.typography.bodySmall.copy(
-//                    color = colorScheme.onSurface.copy(alpha = 0.45f),
-//                    fontWeight = FontWeight.Normal,
-//                    letterSpacing = 0.2.sp
-//                )
-//            )
-//        }
-//
-//        // ── Bottom: Progress + Version ────────────────────────────
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            modifier = Modifier
-//                .align(Alignment.BottomCenter)
-//                .padding(bottom = 40.dp)
-//                .alpha(progressAlpha)
-//        ) {
-//            LinearProgressIndicator(
-//                modifier = Modifier
-//                    .width(48.dp)
-//                    .height(2.dp)
-//                    .clip(RoundedCornerShape(50)),
-//                color = colorScheme.primary,
-//                trackColor = colorScheme.surfaceVariant
-//            )
-//        }
-//    }
-//}
 
 @Composable
 fun MotivationSplashScreen(
     mainNavBackStack: SnapshotStateList<Any>
 ) {
+    val context = LocalContext.current
+
+    val repo = remember {
+        UserRepository(UserPreferences(context))
+    }
+
+    val viewModel: PreferenceSavingViewModel = viewModel(
+        factory = PreferenceViewModelFactory(repo)
+    )
+
+    val theEnterValue = viewModel.userName.collectAsState().value.toString()
+
+
     val colorScheme = MaterialTheme.colorScheme
     val coroutineScope = rememberCoroutineScope()
 
@@ -270,15 +155,36 @@ fun MotivationSplashScreen(
         val firebaseAuth = FirebaseAuth.getInstance()
         val isUserLoggedIn = firebaseAuth.currentUser != null
 
+
         coroutineScope.launch {
             delay(1200)
-            if (isUserLoggedIn) {
+
+            if (isUserLoggedIn && theEnterValue != "null") {
                 mainNavBackStack.add(TeamHeadScreen)
                 mainNavBackStack.remove(SplashScreen)
-            } else {
+            } else if (!isUserLoggedIn) {
                 mainNavBackStack.add(LoginScreen)
                 mainNavBackStack.remove(SplashScreen)
+            } else {
+
+                mainNavBackStack.add(UserCheckingScreen)
+                mainNavBackStack.remove(SplashScreen)
             }
+
+//            if (!isUserLoggedIn && isNameNull) {
+//                mainNavBackStack.add(LoginScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//
+//            } else if (isNameNull) {
+//                // Logged in BUT no data saved yet
+//                mainNavBackStack.add(UserCheckingScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//
+//            } else {
+//                // Fully ready user
+//                mainNavBackStack.add(TeamHeadScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//            }
         }
     }
 

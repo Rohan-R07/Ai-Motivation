@@ -66,25 +66,53 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
+import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
+import com.example.aimotivationapp.Datastore.UserPreferences
+import com.example.aimotivationapp.Datastore.UserRepository
+import com.example.aimotivationapp.MainNavigation.LoginScreen
+import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.ToneChip
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.ToneColor
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.sampleMotivations
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun TeamHeadScreen(
-    userName: String = "Alex",
-    motivations: List<RecentMotivation> = sampleMotivations,
-    onCreateMotivation: () -> Unit = {},
-    onSettings: () -> Unit = {},
+//    userName: String = "Alex",
+    mainNavigation : SnapshotStateList<Any>
+//    motivations: List<RecentMotivation> = sampleMotivations,
+//    onCreateMotivation: () -> Unit = {},
+//    onSettings: () -> Unit = {},
 ) {
+
+    val context = LocalContext.current
+    val repo = remember {
+        UserRepository(UserPreferences(context))
+    }
+
+    val viewModel: PreferenceSavingViewModel = viewModel(
+        factory = PreferenceViewModelFactory(repo)
+    )
+
+    val userName = viewModel.userName.collectAsState().value.toString()
+
+
+
+
+
+    val motivation = sampleMotivations
+
     val colorScheme = MaterialTheme.colorScheme
 
+    val firebaseAuth = FirebaseAuth.getInstance()
     // Local mutable list so deletions update the UI instantly
-    val motivationList = remember { mutableStateListOf(*motivations.toTypedArray()) }
+    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
 
     Scaffold(containerColor = colorScheme.background) { padding ->
         LazyColumn(
@@ -98,8 +126,18 @@ fun TeamHeadScreen(
             item {
                 HeroHeader(
                     userName = userName,
-                    onSettings = onSettings,
-                    onCreateMotivation = onCreateMotivation,
+                    onSettings = {
+                        firebaseAuth.signOut()
+                        viewModel.clearName()
+                        mainNavigation.add(LoginScreen)
+                        mainNavigation.remove(TeamHeadScreen)
+
+
+
+                    },
+                    onCreateMotivation = {
+                        // TODO Generate motivation Screen
+                    },
                 )
             }
 
