@@ -31,6 +31,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,8 +50,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
+import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
+import com.example.aimotivationapp.Datastore.UserPreferences
+import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.MainNavigation.UserCheckingScreen
 import com.example.aimotivationapp.R
 import com.example.aimotivationapp.Screens.AuthScreens.Utils.signInInputs
 import com.example.aimotivationapp.Utils.SignInButton
@@ -83,7 +90,18 @@ fun LoginPotrait(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    val repo = remember {
+        UserRepository(UserPreferences(context))
+    }
 
+    val viewModel: PreferenceSavingViewModel = viewModel(
+        factory = PreferenceViewModelFactory(repo)
+    )
+
+    val theEnterValue = viewModel.userName.collectAsState().value.toString()
+
+
+    Log.d("adding LoginScreen",theEnterValue)
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -209,7 +227,7 @@ fun LoginPotrait(
                                                     )
                                                 }
                                                 signUpLoading.value = false
-                                                mainBackStack.add(TeamHeadScreen)
+                                                mainBackStack.add(UserCheckingScreen)
                                                 mainBackStack.remove(LoginScreen)
 
                                             } else {

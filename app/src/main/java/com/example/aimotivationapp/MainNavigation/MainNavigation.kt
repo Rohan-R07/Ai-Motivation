@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.entryProvider
 
 import androidx.navigation3.ui.NavDisplay
 import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
+import com.example.aimotivationapp.Screens.AuthScreens.UserCheckingScreen
 import com.example.aimotivationapp.Screens.HomeScreens.TeamHeadScreen
 import com.example.aimotivationapp.Screens.MotivationSplashScreen
 
@@ -38,9 +39,12 @@ fun MainNavigation() {
                 // TODO Faculty screen to be disclosed
             }
             entry<TeamHeadScreen>{
-                TeamHeadScreen()
+                TeamHeadScreen(mainNavigation = backStack)
             }
 
+            entry<UserCheckingScreen>{
+                UserCheckingScreen(mainNavBackStack = backStack)
+            }
 
         }
     )

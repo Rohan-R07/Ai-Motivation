@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.runtime)
+//    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,9 +90,20 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
 
 
-    implementation(libs.kotlinx.coroutines.core)
+//    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
     implementation("androidx.compose.material3:material3")
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("com.google.firebase:firebase-ai")
+
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
+
+    // Alternatively - without an Android dependency.
+    implementation("androidx.datastore:datastore-preferences-core:1.2.1")
+
+    implementation("com.google.firebase:firebase-firestore")
+
+    //Firebase AI Logic
 }
