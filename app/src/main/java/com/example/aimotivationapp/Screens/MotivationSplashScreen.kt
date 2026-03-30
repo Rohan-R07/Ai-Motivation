@@ -1,6 +1,7 @@
 package com.example.aimotivationapp.Screens
 
 import android.util.Log
+import androidx.collection.emptyLongSet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -147,44 +148,47 @@ fun MotivationSplashScreen(
         label = "glowAlpha"
     )
 
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val isUserLoggedIn = firebaseAuth.currentUser != null
+
+
     // ─── Launch & Navigate ───────────────────────────────────────
     LaunchedEffect(Unit) {
         startAnimation = true
-//        delay(3500)
-
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val isUserLoggedIn = firebaseAuth.currentUser != null
-
-
+        Log.d("SplashScreen", "USer Logged In $theEnterValue")
+        delay(1000)
+        val isthEnterValueTrue = theEnterValue == "null" // is Empty
+        Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $theEnterValue")
         coroutineScope.launch {
-            delay(1200)
 
-            if (isUserLoggedIn && theEnterValue != "null") {
+            delay(3000)
+
+
+//            if (isUserLoggedIn) {
+//                if (theEnterValue.isEmpty()) {
+//                    mainNavBackStack.add(UserCheckingScreen)
+//                    mainNavBackStack.remove(SplashScreen)
+//                } else {
+//                    mainNavBackStack.add(TeamHeadScreen)
+//                    mainNavBackStack.remove(SplashScreen)
+//                }
+//
+//            } else {
+//                mainNavBackStack.add(LoginScreen)
+//                mainNavBackStack.remove(SplashScreen)
+//            }
+
+
+            if (isUserLoggedIn){
                 mainNavBackStack.add(TeamHeadScreen)
                 mainNavBackStack.remove(SplashScreen)
-            } else if (!isUserLoggedIn) {
-                mainNavBackStack.add(LoginScreen)
-                mainNavBackStack.remove(SplashScreen)
-            } else {
 
+            }
+            else{
                 mainNavBackStack.add(UserCheckingScreen)
                 mainNavBackStack.remove(SplashScreen)
             }
 
-//            if (!isUserLoggedIn && isNameNull) {
-//                mainNavBackStack.add(LoginScreen)
-//                mainNavBackStack.remove(SplashScreen)
-//
-//            } else if (isNameNull) {
-//                // Logged in BUT no data saved yet
-//                mainNavBackStack.add(UserCheckingScreen)
-//                mainNavBackStack.remove(SplashScreen)
-//
-//            } else {
-//                // Fully ready user
-//                mainNavBackStack.add(TeamHeadScreen)
-//                mainNavBackStack.remove(SplashScreen)
-//            }
         }
     }
 

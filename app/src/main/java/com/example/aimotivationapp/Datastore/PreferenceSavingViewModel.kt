@@ -16,7 +16,7 @@ class PreferenceSavingViewModel(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            null
+            "null"
         )
 
     // 🔹 First time save

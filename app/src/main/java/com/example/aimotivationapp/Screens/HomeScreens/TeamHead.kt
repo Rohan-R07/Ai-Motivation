@@ -73,6 +73,7 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.MainNavigation.UserCheckingScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
@@ -129,8 +130,9 @@ fun TeamHeadScreen(
                     onSettings = {
                         firebaseAuth.signOut()
                         viewModel.clearName()
-                        mainNavigation.add(LoginScreen)
+                        mainNavigation.add(UserCheckingScreen)
                         mainNavigation.remove(TeamHeadScreen)
+
 
 
 

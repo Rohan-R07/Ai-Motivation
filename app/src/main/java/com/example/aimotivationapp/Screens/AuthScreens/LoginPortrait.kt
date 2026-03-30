@@ -64,6 +64,7 @@ import com.example.aimotivationapp.Utils.SignInButton
 import com.example.aimotivationapp.Utils.UserAndPasswardTextField
 import com.example.aimotivationapp.Utils.isLandscape
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.launch
 
 
@@ -101,7 +102,7 @@ fun LoginPotrait(
     val theEnterValue = viewModel.userName.collectAsState().value.toString()
 
 
-    Log.d("adding LoginScreen",theEnterValue)
+//    Log.d("adding LoginScreen",theEnterValue)
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -227,8 +228,9 @@ fun LoginPotrait(
                                                     )
                                                 }
                                                 signUpLoading.value = false
-                                                mainBackStack.add(UserCheckingScreen)
+                                                mainBackStack.add(TeamHeadScreen)
                                                 mainBackStack.remove(LoginScreen)
+                                                mainBackStack.remove(UserCheckingScreen)
 
                                             } else {
                                                 val errorMessage = it.exception?.message
@@ -383,6 +385,7 @@ fun LoginPotrait(
 
                                                     mainBackStack.add(TeamHeadScreen)
                                                     mainBackStack.remove(LoginScreen)
+                                                    mainBackStack.remove(UserCheckingScreen)
                                                     registerLoading.value = false
 
                                                 } else {
