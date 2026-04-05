@@ -7,33 +7,76 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+//class PreferenceSavingViewModel(
+//    private val repo: UserRepository
+//) : ViewModel() {
+//
+//    // 🔥 Reactive name (auto updates UI)
+//    val userName: StateFlow<String?> = repo.getUserName()
+//        .stateIn(
+//            viewModelScope,
+//            SharingStarted.WhileSubscribed(5000),
+//            "null"
+//        )
+//
+//    // 🔹 First time save
+//    fun saveName(name: String) {
+//        viewModelScope.launch {
+//            repo.saveAndUpdateName(name)
+//        }
+//    }
+//
+//    // 🔹 First time save
+//    fun clearName() {
+//        viewModelScope.launch {
+//            repo.clearData()
+//        }
+//    }
+//}
+
+
+
 class PreferenceSavingViewModel(
     private val repo: UserRepository
 ) : ViewModel() {
 
-    // 🔥 Reactive name (auto updates UI)
+    // 🔥 Name Flow
     val userName: StateFlow<String?> = repo.getUserName()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null
+        )
+
+    // 🔥 Email Flow
+    val userEmail: StateFlow<String?> = repo.getUserEmail()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             "null"
         )
 
-    // 🔹 First time save
+    // 🔹 Save name
     fun saveName(name: String) {
         viewModelScope.launch {
             repo.saveAndUpdateName(name)
         }
     }
 
-    // 🔹 First time save
-    fun clearName() {
+    // 🔹 Save email
+    fun saveEmail(email: String) {
+        viewModelScope.launch {
+            repo.saveAndUpdateEmail(email)
+        }
+    }
+
+    // 🔹 Clear all (logout)
+    fun clearData() {
         viewModelScope.launch {
             repo.clearData()
         }
     }
 }
-
 
 class PreferenceViewModelFactory(
     private val repo: UserRepository

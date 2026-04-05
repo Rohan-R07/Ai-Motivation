@@ -1,12 +1,10 @@
 package com.example.aimotivationapp.Screens
 
 import android.util.Log
-import androidx.collection.emptyLongSet
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,9 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
@@ -31,43 +26,24 @@ import kotlinx.coroutines.launch
 
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
 import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
 import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
-import com.example.aimotivationapp.MainNavigation.UserCheckingScreen
-import kotlinx.coroutines.delay
+import com.example.aimotivationapp.FirebaseFirestore.FirestoreViewModel
+import com.example.aimotivationapp.MainNavigation.FacultyScreen
 
 @Composable
 fun MotivationSplashScreen(
@@ -83,7 +59,7 @@ fun MotivationSplashScreen(
         factory = PreferenceViewModelFactory(repo)
     )
 
-    val theEnterValue = viewModel.userName.collectAsState().value.toString()
+    val theEnterEmail = viewModel.userEmail.collectAsState().value.toString()
 
 
     val colorScheme = MaterialTheme.colorScheme
@@ -149,47 +125,70 @@ fun MotivationSplashScreen(
     )
 
     val firebaseAuth = FirebaseAuth.getInstance()
+
     val isUserLoggedIn = firebaseAuth.currentUser != null
 
+    val fireStoreViewModel: FirestoreViewModel = viewModel()
+    val isUserPresent = remember { mutableStateOf(false) }
 
+    val userEmail = firebaseAuth.currentUser?.email?.trim()?.lowercase().toString()
     // ─── Launch & Navigate ───────────────────────────────────────
     LaunchedEffect(Unit) {
         startAnimation = true
-        Log.d("SplashScreen", "USer Logged In $theEnterValue")
+        Log.d("SplashScreen", "USer Logged In $theEnterEmail")
         delay(1000)
-        val isthEnterValueTrue = theEnterValue == "null" // is Empty
-        Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $theEnterValue")
+
+        Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $theEnterEmail")
         coroutineScope.launch {
-
             delay(3000)
+            if (isUserLoggedIn && userEmail != "null") {
+                fireStoreViewModel.checkUserRoleforHeadLoginScreen(
+                    userEmail,
+                    onSuccess = {
+                        isUserPresent.value = true
+                        Log.d("Splashing", "it is true")
+                        Log.d("Splashing", firebaseAuth.currentUser?.email.toString())
+                        mainNavBackStack.add(TeamHeadScreen)
+                        mainNavBackStack.remove(SplashScreen)
+                        isUserPresent.value = false
+                    },
+                    onFailure = {
+                        isUserPresent.value = false
+                        Log.d("Splashing", "it is false")
+                        Log.d("Splashing", firebaseAuth.currentUser?.email.toString())
+                        mainNavBackStack.add(FacultyScreen)
+                        mainNavBackStack.remove(SplashScreen)
+                        isUserPresent.value = false
+                    }
+                )
+            } else {
+                mainNavBackStack.add(LoginScreen)
+                mainNavBackStack.remove(SplashScreen)
+            }
+        }
 
 
+//        coroutineScope.launch {
+//
+//            delay(3000)
+//
 //            if (isUserLoggedIn) {
-//                if (theEnterValue.isEmpty()) {
-//                    mainNavBackStack.add(UserCheckingScreen)
-//                    mainNavBackStack.remove(SplashScreen)
-//                } else {
+////                if (theEnterEmail == "null") {
+//                if (isUserPresent.value) {
 //                    mainNavBackStack.add(TeamHeadScreen)
 //                    mainNavBackStack.remove(SplashScreen)
-//                }
+//                    isUserPresent.value = false
 //
+//                } else {
+//                    mainNavBackStack.add(FacultyScreen)
+//                    mainNavBackStack.remove(SplashScreen)
+//                    isUserPresent.value = false
+//
+//                }
 //            } else {
-//                mainNavBackStack.add(LoginScreen)
-//                mainNavBackStack.remove(SplashScreen)
+//
 //            }
-
-
-            if (isUserLoggedIn){
-                mainNavBackStack.add(TeamHeadScreen)
-                mainNavBackStack.remove(SplashScreen)
-
-            }
-            else{
-                mainNavBackStack.add(UserCheckingScreen)
-                mainNavBackStack.remove(SplashScreen)
-            }
-
-        }
+//        }
     }
 
     Box(
@@ -214,6 +213,7 @@ fun MotivationSplashScreen(
                         .size(90.dp)
                         .scale(logoScale)
                         .background(
+
                             color = colorScheme.primary.copy(alpha = glowAlpha),
                             shape = RoundedCornerShape(cornerRadius.dp)
                         )
