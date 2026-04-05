@@ -1,54 +1,47 @@
 package com.example.aimotivationapp.FirebaseFirestore
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-//
-//class FirestoreViewModel : ViewModel() {
-//
-//    private val db = FirebaseFirestore.getInstance()
-//
-//    private val _documentIds = MutableStateFlow<List<String>>(emptyList())
-//    val documentIds: StateFlow<List<String>> = _documentIds
-//
-//    fun fetchDocumentIds() {
-//        db.collection("your_collection_name")
-//            .get()
-//            .addOnSuccessListener { result ->
-//                val ids = result.map { it.id }
-//                _documentIds.value = ids
-//            }
-//            .addOnFailureListener {
-//                // handle error if needed
-//            }
-//    }
-//}
+
 
 class FirestoreViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
 
-    fun checkUserRole(
+    fun checkUserRoleforHeadLoginScreen(
         email: String,
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
+
+
         FirebaseFirestore.getInstance()
             .collection("roles")
             .document(email.trim()) // important
+//            .document()
             .get()
             .addOnSuccessListener { doc ->
+
+                Log.d("DEBUG_ROLE", "Email: $email")
+                Log.d("DEBUG_ROLE", "Exists: ${doc.exists()}")
+                Log.d("DEBUG_ROLE", "Doc ID: ${doc.id}")
+
                 if (doc.exists()) {
-                    onSuccess()   // ✅ user exists (has role)
+                    Log.d("Monitor viewModel",email)
+                    onSuccess()
                 } else {
-                    onFailure()   // ❌ not found
+                    onFailure()
+                    Log.d("Monitor viewModel",email)
+
                 }
+
             }
             .addOnFailureListener {
                 onFailure()
+                Log.d("TeamHeadLoginScree", it.toString())
             }
     }
+
+
 }

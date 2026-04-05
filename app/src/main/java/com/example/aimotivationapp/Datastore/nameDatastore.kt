@@ -14,6 +14,7 @@ class UserPreferences(private val context: Context) {
 
     companion object {
         val USER_NAME = stringPreferencesKey("user_name")
+        val USER_EMAIL = stringPreferencesKey("user_email") // ✅ NEW
     }
 
     // 🔹 Get name
@@ -23,13 +24,26 @@ class UserPreferences(private val context: Context) {
         }
     }
 
-    // 🔹 Save name (first time)
+    // 🔹 Get email
+    fun getUserEmail(): Flow<String?> {
+        return context.dataStore.data.map { prefs ->
+            prefs[USER_EMAIL]
+        }
+    }
+
+    // 🔹 Save name
     suspend fun saveAndUpdateName(name: String) {
         context.dataStore.edit { prefs ->
             prefs[USER_NAME] = name
         }
     }
 
+    // 🔹 Save email
+    suspend fun saveAndUpdateEmail(email: String) {
+        context.dataStore.edit { prefs ->
+            prefs[USER_EMAIL] = email
+        }
+    }
 
     // 🔹 Clear data (logout)
     suspend fun clear() {

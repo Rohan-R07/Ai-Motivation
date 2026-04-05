@@ -1,22 +1,30 @@
 package com.example.aimotivationapp.Datastore
 
 
-
 import kotlinx.coroutines.flow.Flow
+
 
 class UserRepository(
     private val preferences: UserPreferences
 ) {
 
-    // to get the user data in the home screen
+    // 🔹 Get name
     fun getUserName(): Flow<String?> = preferences.getUserName()
 
-    // to update or save the name while loggin in or re-loggin in or signing up
+    // 🔹 Get email
+    fun getUserEmail(): Flow<String?> = preferences.getUserEmail()
+
+    // 🔹 Save name
     suspend fun saveAndUpdateName(name: String) {
         preferences.saveAndUpdateName(name)
     }
 
-    // clearing the data while logging out
+    // 🔹 Save email
+    suspend fun saveAndUpdateEmail(email: String) {
+        preferences.saveAndUpdateEmail(email)
+    }
+
+    // 🔹 Clear data
     suspend fun clearData() {
         preferences.clear()
     }

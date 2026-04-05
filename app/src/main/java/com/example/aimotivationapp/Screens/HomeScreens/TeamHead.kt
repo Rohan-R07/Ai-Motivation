@@ -129,13 +129,9 @@ fun TeamHeadScreen(
                     userName = userName,
                     onSettings = {
                         firebaseAuth.signOut()
-                        viewModel.clearName()
-                        mainNavigation.add(UserCheckingScreen)
+                        viewModel.clearData()
+                        mainNavigation.add(LoginScreen)
                         mainNavigation.remove(TeamHeadScreen)
-
-
-
-
                     },
                     onCreateMotivation = {
                         // TODO Generate motivation Screen
