@@ -1,9 +1,19 @@
 package com.example.aimotivationapp.MainNavigation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 
 import androidx.navigation3.runtime.entryProvider
@@ -11,6 +21,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
 import com.example.aimotivationapp.Screens.AuthScreens.TeamHeadLoginScreen
+import com.example.aimotivationapp.Screens.CreateMotivationScreen
 //import com.example.aimotivationapp.Screens.AuthScreens.UserCheckingScreen
 import com.example.aimotivationapp.Screens.HomeScreens.FacultyScreen
 import com.example.aimotivationapp.Screens.HomeScreens.TeamHeadScreen
@@ -21,7 +32,41 @@ fun MainNavigation() {
 
 //
     val backStack = remember { mutableStateListOf<Any>(SplashScreen) }
+//
+//
+//    NavDisplay(
+//        backStack = backStack,
+//        onBack = {
+//            backStack.removeLastOrNull()
+//        },
+//
+//        entryProvider = entryProvider {
+//            entry<SplashScreen>{
+//                MotivationSplashScreen(mainNavBackStack = backStack )
+//            }
+//
+//            entry<LoginScreen>{
+//                LoginScreen(backStack)
+//            }
+//            entry<FacultyScreen>{
+//                FacultyScreen(mainBackStack = backStack)
+//            }
+//            entry<TeamHeadScreen>{
+//                TeamHeadScreen(mainNavigation = backStack)
+//            }
+//
+//            entry<GenerateMotivationScreen> {
+//                CreateMotivationScreen()
+//            }
+//            entry<TeamHeadLoginScreen>{
+//                TeamHeadLoginScreen(backStack)
+//            }
+//
+//        }
+//    )
+//
 
+    var previousSize by remember { mutableStateOf(backStack.size) }
 
     NavDisplay(
         backStack = backStack,
@@ -29,30 +74,43 @@ fun MainNavigation() {
             backStack.removeLastOrNull()
         },
 
-        entryProvider = entryProvider {
-            entry<SplashScreen>{
-                MotivationSplashScreen(mainNavBackStack = backStack )
-            }
+        transitionSpec = {
 
-            entry<LoginScreen>{
+            val isPush = backStack.size > previousSize
+            previousSize = backStack.size
+
+            if (isPush) {
+                // 👉 POP (BACK BUTTON)
+                slideInHorizontally { -it } + fadeIn() togetherWith
+                        slideOutHorizontally { it } + fadeOut()
+            } else {
+
+
+                // 👉 PUSH
+                slideInHorizontally { it } + fadeIn() togetherWith
+                        slideOutHorizontally { -it / 3 } + fadeOut()
+            }
+        },
+
+        entryProvider = entryProvider {
+            entry<SplashScreen> {
+                MotivationSplashScreen(mainNavBackStack = backStack)
+            }
+            entry<LoginScreen> {
                 LoginScreen(backStack)
             }
-            entry<FacultyScreen>{
-                FacultyScreen(backStack)
+            entry<FacultyScreen> {
+                FacultyScreen(mainBackStack = backStack)
             }
-            entry<TeamHeadScreen>{
+            entry<TeamHeadScreen> {
                 TeamHeadScreen(mainNavigation = backStack)
             }
-
-            entry<UserCheckingScreen>{
-//                UserCheckingScreen(mainNavBackStack = backStack)
+            entry<GenerateMotivationScreen> {
+                CreateMotivationScreen()
             }
-
-            entry<TeamHeadLoginScreen>{
+            entry<TeamHeadLoginScreen> {
                 TeamHeadLoginScreen(backStack)
             }
-
         }
     )
-
 }

@@ -24,4 +24,7 @@ data object UserCheckingScreen
 @Serializable
 data object TeamHeadLoginScreen
 
+@Serializable
+data object GenerateMotivationScreen
+
 //}
