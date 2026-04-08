@@ -50,36 +50,47 @@ fun MotivationCard(motivation: RecentMotivation) {
     val context = LocalContext.current
 
     // TONE COLOUR Section
+
     val accentContainer = when (motivation.toneColor) {
-        ToneColor.Friendly -> colorScheme.tertiaryContainer
-        ToneColor.Encouraging -> colorScheme.secondaryContainer
-        ToneColor.Inspiring -> colorScheme.primaryContainer
-        ToneColor.Bold -> colorScheme.errorContainer
+        ToneColor.Friendly.toString() -> colorScheme.tertiaryContainer
+        ToneColor.Encouraging.toString() -> colorScheme.secondaryContainer
+        ToneColor.Inspiring.toString() -> colorScheme.primaryContainer
+        ToneColor.Bold.toString() -> colorScheme.errorContainer
+        else -> {
+            colorScheme.surfaceVariant
+        }
     }
     val accentContent = when (motivation.toneColor) {
-        ToneColor.Friendly -> colorScheme.onTertiaryContainer
-        ToneColor.Encouraging -> colorScheme.onSecondaryContainer
-        ToneColor.Inspiring -> colorScheme.onPrimaryContainer
-        ToneColor.Bold -> colorScheme.onErrorContainer
+        ToneColor.Friendly.toString() -> colorScheme.onTertiaryContainer
+        ToneColor.Encouraging.toString() -> colorScheme.onSecondaryContainer
+        ToneColor.Inspiring.toString() -> colorScheme.onPrimaryContainer
+        ToneColor.Bold.toString() -> colorScheme.onErrorContainer
+        else -> {
+            colorScheme.surfaceVariant
+
+        }
     }
     val accentPrimary = when (motivation.toneColor) {
-        ToneColor.Friendly -> colorScheme.tertiary
-        ToneColor.Encouraging -> colorScheme.secondary
-        ToneColor.Inspiring -> colorScheme.primary
-        ToneColor.Bold -> colorScheme.error
+        ToneColor.Friendly.toString() -> colorScheme.tertiary
+        ToneColor.Encouraging.toString() -> colorScheme.secondary
+        ToneColor.Inspiring.toString() -> colorScheme.primary
+        ToneColor.Bold.toString() -> colorScheme.error
+        else -> {
+            colorScheme.surfaceVariant
+
+        }
     }
 
     // Share intent helper — opens the system share sheet (WhatsApp, Gmail, etc.)
     fun shareMotivation() {
         val shareText = buildString {
-            append("${motivation.emoji} ${motivation.tone} message for ${motivation.team}\n\n")
+            append("${motivation.emoji} ${motivation.tone} \n\n")
             append("\"${motivation.message}\"\n\n")
             append("— Sent via Ai Motivation App")
         }
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
-            putExtra(Intent.EXTRA_SUBJECT, "Motivation for ${motivation.team}")
         }
         context.startActivity(Intent.createChooser(intent, "Share motivation via…"))
     }
@@ -199,11 +210,6 @@ fun MotivationCard(motivation: RecentMotivation) {
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Icon(Icons.Outlined.Group, null, modifier = Modifier.size(13.dp), tint = colorScheme.onSurfaceVariant)
-                            Text(
-                                motivation.team,
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                                color = colorScheme.onSurfaceVariant,
-                            )
                         }
 
 
