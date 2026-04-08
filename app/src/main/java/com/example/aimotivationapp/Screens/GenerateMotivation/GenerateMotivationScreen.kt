@@ -1,5 +1,6 @@
-package com.example.aimotivationapp.Screens
+package com.example.aimotivationapp.Screens.GenerateMotivation
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -10,12 +11,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +32,12 @@ fun CreateMotivationScreen(
     onBack: () -> Unit = {},
 //    onGenerate: (tone: String, purpose: String, length: String, context: String) -> Unit = { _, _, _, _ -> }
 ) {
+
+    // initilizing Ai View Model
+    val aiViewModel : AiViewModel = viewModel()
+
+
+
     var selectedTone    by remember { mutableStateOf<String?>(null) }
     var selectedPurpose by remember { mutableStateOf<String?>(null) }
     var selectedLength  by remember { mutableStateOf<String?>(null) }
@@ -123,14 +130,20 @@ fun CreateMotivationScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Prompting
+
+                val prompting = """
+                    generate a motivation quote to cheir my team members in a firendly way
+                """.trimIndent()
+
                 // ── Generate button ───────────────────────────────────────
                 GenerateButton(
                     enabled = canGenerate,
                     onClick = {
-
+                        aiViewModel.generateMotivation(prompting)
                     }
                 )
-
+                Log.d("AIViewModel",aiViewModel.uiState)
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
