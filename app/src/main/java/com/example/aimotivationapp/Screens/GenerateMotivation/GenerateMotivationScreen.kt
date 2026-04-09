@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
+import kotlin.math.log
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -158,7 +160,16 @@ fun CreateMotivationScreen(
                         aiViewModel.generateMotivation(prompt)
                     }
                 )
-                Log.d("AIViewMoel", aiViewModel.uiState)
+                if(aiViewModel.uiState.isNotEmpty()){
+                    val lists = parseMotivations(aiViewModel.uiState)
+                    lists.forEach { item ->
+
+                        Log.d("AIViewModel",item.toString())
+
+
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
