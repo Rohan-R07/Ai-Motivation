@@ -83,27 +83,32 @@ dependencies {
 
     // firebase email and passward auth
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+    implementation(platform(libs.firebase.bom))
 
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth")
+    implementation(libs.google.firebase.auth)
 
 
 //    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    implementation("androidx.compose.material3:material3")
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.androidx.material3)
+    implementation(libs.coil.compose)
 
-    implementation("com.google.firebase:firebase-ai")
+    implementation(libs.firebase.ai)
 
-    implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation(libs.androidx.datastore.preferences)
 
     // Alternatively - without an Android dependency.
-    implementation("androidx.datastore:datastore-preferences-core:1.2.1")
+    implementation(libs.androidx.datastore.preferences.core)
 
-    implementation("com.google.firebase:firebase-firestore")
+    implementation(libs.firebase.firestore)
 
     //Firebase AI Logic
+    implementation(platform(libs.firebase.bom))
+
+    // Add the dependency for the Firebase AI Logic library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation(libs.google.firebase.ai)
 }

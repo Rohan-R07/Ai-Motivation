@@ -1,7 +1,5 @@
 package com.example.aimotivationapp.MainNavigation
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -21,7 +19,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
 import com.example.aimotivationapp.Screens.AuthScreens.TeamHeadLoginScreen
-import com.example.aimotivationapp.Screens.CreateMotivationScreen
+import com.example.aimotivationapp.Screens.GenerateMotivation.CreateMotivationScreen
 //import com.example.aimotivationapp.Screens.AuthScreens.UserCheckingScreen
 import com.example.aimotivationapp.Screens.HomeScreens.FacultyScreen
 import com.example.aimotivationapp.Screens.HomeScreens.TeamHeadScreen

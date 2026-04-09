@@ -1,5 +1,6 @@
-package com.example.aimotivationapp.Screens
+package com.example.aimotivationapp.Screens.GenerateMotivation
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -10,18 +11,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-private val toneOptions    = listOf("Motivational", "Encouraging", "Positive", "Uplifting", "Friendly")
+private val toneOptions = listOf("Motivational", "Encouraging", "Positive", "Uplifting", "Friendly")
 private val purposeOptions = listOf("Welcome", "Remainder", "Appreciation", "Push", "Team Reset")
-private val lengthOptions  = listOf("Short", "Medium", "Long")
+private val lengthOptions = listOf("Short", "Medium", "Long")
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
@@ -31,10 +32,15 @@ fun CreateMotivationScreen(
     onBack: () -> Unit = {},
 //    onGenerate: (tone: String, purpose: String, length: String, context: String) -> Unit = { _, _, _, _ -> }
 ) {
-    var selectedTone    by remember { mutableStateOf<String?>(null) }
+
+    // initilizing Ai View Model
+    val aiViewModel: AiViewModel = viewModel()
+
+
+    var selectedTone by remember { mutableStateOf<String?>(null) }
     var selectedPurpose by remember { mutableStateOf<String?>(null) }
-    var selectedLength  by remember { mutableStateOf<String?>(null) }
-    var contextText     by remember { mutableStateOf("") }
+    var selectedLength by remember { mutableStateOf<String?>(null) }
+    var contextText by remember { mutableStateOf("") }
 
     val canGenerate = selectedTone != null && selectedPurpose != null && selectedLength != null
 
@@ -123,14 +129,36 @@ fun CreateMotivationScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Prompting
+
+//                val prompting = """
+//                    generate a motivation quote to cheir my team members in a firendly way
+//                """.trimIndent()
+
+                val prompt = """
+                    Generate 5 team motivation messages.
+
+                        Tone: $selectedTone  
+                        Purpose: $selectedPurpose
+                        Length: $selectedLength
+                        Context: $contextText
+                        
+                        Rules:
+                        - Return ONLY JSON
+                        - Format must be: {"motivations": ["...", "..."]}
+                        - No explanation, no extra text
+                        - Each item must be unique
+                        - Follow tone, purpose and length strictly
+                    """.trimIndent()
+
                 // ── Generate button ───────────────────────────────────────
                 GenerateButton(
                     enabled = canGenerate,
                     onClick = {
-
+                        aiViewModel.generateMotivation(prompt)
                     }
                 )
-
+                Log.d("AIViewMoel", aiViewModel.uiState)
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
@@ -241,14 +269,14 @@ private fun ContextInputField(
                 )
             },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor    = Color.Transparent,
-                unfocusedContainerColor  = Color.Transparent,
-                disabledContainerColor   = Color.Transparent,
-                focusedIndicatorColor    = Color.Transparent,
-                unfocusedIndicatorColor  = Color.Transparent,
-                disabledIndicatorColor   = Color.Transparent,
-                focusedTextColor         = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor       = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -270,15 +298,15 @@ private fun GenerateButton(
         enabled = enabled,
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
-            containerColor         = MaterialTheme.colorScheme.primary,
-            contentColor           = MaterialTheme.colorScheme.onPrimary,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor   = MaterialTheme.colorScheme.onSurfaceVariant
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation        = 4.dp,
+            defaultElevation = 4.dp,
 
-        ),
+            ),
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
