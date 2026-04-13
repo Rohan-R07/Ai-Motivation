@@ -157,19 +157,17 @@ fun CreateMotivationScreen(
                 GenerateButton(
                     enabled = canGenerate,
                     onClick = {
-                        aiViewModel.generateMotivation(prompt)
+//                        aiViewModel.generateMotivation(prompt)
+//                        if (aiViewModel.uiState.isNotEmpty()) {
+//                            val lists = parseMotivations(aiViewModel.uiState)
+//                            lists.forEach { item ->
+//                                // TODO to add motivation quotes
+//                                Log.d("AIViewModel", item.toString())
+//                            }
+//                        }
+
                     }
                 )
-                if(aiViewModel.uiState.isNotEmpty()){
-                    val lists = parseMotivations(aiViewModel.uiState)
-                    lists.forEach { item ->
-
-                        Log.d("AIViewModel",item.toString())
-
-
-                    }
-                }
-
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
