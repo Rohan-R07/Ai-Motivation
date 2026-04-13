@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.cardview)
 //    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

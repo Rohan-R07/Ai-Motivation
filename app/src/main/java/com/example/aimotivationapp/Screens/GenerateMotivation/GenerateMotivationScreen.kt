@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
+import kotlin.math.log
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -155,10 +157,17 @@ fun CreateMotivationScreen(
                 GenerateButton(
                     enabled = canGenerate,
                     onClick = {
-                        aiViewModel.generateMotivation(prompt)
+//                        aiViewModel.generateMotivation(prompt)
+//                        if (aiViewModel.uiState.isNotEmpty()) {
+//                            val lists = parseMotivations(aiViewModel.uiState)
+//                            lists.forEach { item ->
+//                                // TODO to add motivation quotes
+//                                Log.d("AIViewModel", item.toString())
+//                            }
+//                        }
+
                     }
                 )
-                Log.d("AIViewMoel", aiViewModel.uiState)
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
