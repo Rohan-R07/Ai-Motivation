@@ -36,7 +36,6 @@ lifecycleViewmodel = "1.0.0-SNAPSHOT"
 material3 = "1.4.0-alpha15"
 runtime = "1.10.6"
 firebaseFirestoreKtx = "26.1.2"
-cardview = "1.0.0"
 
 
 [libraries]
@@ -86,7 +85,6 @@ androidx-material3-adaptive-navigation3 = { group = "androidx.compose.material3.
 fkotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
-androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

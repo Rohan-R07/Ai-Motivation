@@ -18,13 +18,15 @@ data object FacultyScreen
 @Serializable
 data object LoginScreen
 
-@Serializable
-data object UserCheckingScreen
 
 @Serializable
 data object TeamHeadLoginScreen
 
 @Serializable
-data object GenerateMotivationScreen
+data object CreateMotivation
+
+@Serializable
+data object GeneratedMotivationScreen
+
 
 //}
