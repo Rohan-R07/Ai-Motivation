@@ -155,11 +155,7 @@ fun MotivationCard(motivation: RecentMotivation) {
                             )
                         }
                     }
-                    Text(
-                        motivation.timeAgo,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    )
+
                 }
 
                 Spacer(Modifier.height(14.dp))

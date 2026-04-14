@@ -19,7 +19,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.aimotivationapp.Screens.AuthScreens.LoginScreen
 import com.example.aimotivationapp.Screens.AuthScreens.TeamHeadLoginScreen
-import com.example.aimotivationapp.Screens.GenerateMotivation.GenerateMotivationScreen
+import com.example.aimotivationapp.Screens.GenerateMotivation.CreateMotivationScreen
+
 //import com.example.aimotivationapp.Screens.AuthScreens.UserCheckingScreen
 import com.example.aimotivationapp.Screens.HomeScreens.FacultyScreen
 import com.example.aimotivationapp.Screens.HomeScreens.TeamHeadScreen
@@ -30,39 +31,7 @@ fun MainNavigation() {
 
 //
     val backStack = remember { mutableStateListOf<Any>(SplashScreen) }
-//
-//
-//    NavDisplay(
-//        backStack = backStack,
-//        onBack = {
-//            backStack.removeLastOrNull()
-//        },
-//
-//        entryProvider = entryProvider {
-//            entry<SplashScreen>{
-//                MotivationSplashScreen(mainNavBackStack = backStack )
-//            }
-//
-//            entry<LoginScreen>{
-//                LoginScreen(backStack)
-//            }
-//            entry<FacultyScreen>{
-//                FacultyScreen(mainBackStack = backStack)
-//            }
-//            entry<TeamHeadScreen>{
-//                TeamHeadScreen(mainNavigation = backStack)
-//            }
-//
-//            entry<GenerateMotivationScreen> {
-//                CreateMotivationScreen()
-//            }
-//            entry<TeamHeadLoginScreen>{
-//                TeamHeadLoginScreen(backStack)
-//            }
-//
-//        }
-//    )
-//
+
 
     var previousSize by remember { mutableStateOf(backStack.size) }
 
@@ -103,12 +72,16 @@ fun MainNavigation() {
             entry<TeamHeadScreen> {
                 TeamHeadScreen(mainNavigation = backStack)
             }
-            entry<GenerateMotivationScreen> {
-                GenerateMotivationScreen()
+            entry<CreateMotivation> {
+                CreateMotivationScreen(backStack)
             }
             entry<TeamHeadLoginScreen> {
                 TeamHeadLoginScreen(backStack)
             }
+
+//            entry<GeneratedMotivationScreen> {
+//                GeneratedMotivationQuoteScreen {  }
+//            }
         }
     )
 }

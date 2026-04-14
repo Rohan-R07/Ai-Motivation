@@ -14,7 +14,6 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.FacultyScreen
 import com.example.aimotivationapp.MainNavigation.LoginScreen
-import com.example.aimotivationapp.MainNavigation.UserCheckingScreen
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
@@ -334,8 +333,6 @@ fun FacultyScreen(
                     tone = "Success",
                     toneColor = ToneColor.Friendly.toString(),
                     message = "The secret of getting ahead is getting started.",
-                    timeAgo = "2h ago",
-                    sentBy = "Dr. Rajan",
                     emoji = "🏆"
                 ),
                 RecentMotivation(
@@ -343,8 +340,7 @@ fun FacultyScreen(
                     tone = "Perseverance",
                     toneColor = ToneColor.Encouraging.toString(),
                     message = "Believe you can and you're halfway there.",
-                    timeAgo = "5h ago",
-                    sentBy = "Dr. Rajan",
+
                     emoji = "🔥"
                 ),
                 RecentMotivation(
@@ -353,8 +349,7 @@ fun FacultyScreen(
                     toneColor = ToneColor.Inspiring.toString(),
                     message = "Push yourself, because no one else is going to do it for you.",
 
-                    timeAgo = "1d ago",
-                    sentBy = "Dr. Rajan",
+
                     emoji = "🌱"
                 ),
                 RecentMotivation(
@@ -362,8 +357,7 @@ fun FacultyScreen(
                     tone = "Creativity",
                     toneColor = ToneColor.Bold.toString(),
                     message = "Your limitation — it's only your imagination.",
-                    timeAgo = "1d ago",
-                    sentBy = "Dr. Rajan",
+
                     emoji = "✨"
                 ),
                 RecentMotivation(
@@ -371,8 +365,7 @@ fun FacultyScreen(
                     tone = "Leadership",
                     toneColor = ToneColor.Friendly.toString(),
                     message = "Wake up with determination. Go to bed with satisfaction.",
-                    timeAgo = "2d ago",
-                    sentBy = "Dr. Rajan",
+
                     emoji = "⭐"
                 ),
                 RecentMotivation(
@@ -380,8 +373,6 @@ fun FacultyScreen(
                     tone = "Wisdom",
                     toneColor = ToneColor.Encouraging.toString(),
                     message = "Do something today that your future self will thank you for.",
-                    timeAgo = "3d ago",
-                    sentBy = "Dr. Rajan",
                     emoji = "🦉"
                 ),
                 RecentMotivation(
@@ -390,8 +381,6 @@ fun FacultyScreen(
                     toneColor = ToneColor.Inspiring.toString(),
                     message = "The harder you work for something, the greater you'll feel.",
 
-                    timeAgo = "3d ago",
-                    sentBy = "Dr. Rajan",
                     emoji = "🎯"
                 ),
                 RecentMotivation(
@@ -399,8 +388,6 @@ fun FacultyScreen(
                     tone = "Success",
                     toneColor = ToneColor.Encouraging.toString(),
                     message = "Great things never come from comfort zones.",
-                    timeAgo = "4d ago",
-                    sentBy = "Dr. Rajan",
                     emoji = "🚀"
                 ),
             )
@@ -617,9 +604,7 @@ fun FacultyScreen(
                                 else bookmarks.add(quote.id)
                             },
                             onCopy = {
-                                clipboard.setText(
-                                    AnnotatedString("\"${quote.message}\" — ${quote.sentBy}")
-                                )
+
                                 scope.launch {
                                     snackbar.showSnackbar(
                                         "Quote copied to clipboard",
@@ -1120,13 +1105,7 @@ private fun QuoteCard(
                             .height(2.dp)
                             .background(catColor.copy(0.55f), RoundedCornerShape(1.dp))
                     )
-                    Text(
-                        quote.sentBy,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = cs.onSurface.copy(alpha = 0.72f)
-                        )
-                    )
+
                 }
 
                 Spacer(Modifier.height(18.dp))
@@ -1165,21 +1144,7 @@ private fun QuoteCard(
                                 modifier = Modifier.size(14.dp)
                             )
                         }
-                        Column {
-                            Text(
-                                quote.sentBy,
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = cs.onSurface.copy(alpha = 0.65f),
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                            Text(
-                                quote.timeAgo,
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = cs.onSurface.copy(alpha = 0.40f)
-                                )
-                            )
-                        }
+
                     }
 
                     // Action buttons
