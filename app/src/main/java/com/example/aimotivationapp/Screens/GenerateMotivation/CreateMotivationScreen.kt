@@ -1,336 +1,5 @@
 package com.example.aimotivationapp.Screens.GenerateMotivation
 
-//
-//import androidx.compose.animation.animateColorAsState
-//import androidx.compose.animation.core.tween
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.rememberScrollState
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.foundation.verticalScroll
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.automirrored.filled.ArrowBack
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.runtime.snapshots.SnapshotStateList
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import com.example.aimotivationapp.MainNavigation.GeneratedMotivationScreen
-//
-//// ─── Data ────────────────────────────────────────────────────────────────────
-//
-//private val toneOptions = listOf("Motivational", "Encouraging", "Positive", "Uplifting", "Friendly")
-//private val purposeOptions = listOf("Welcome", "Remainder", "Appreciation", "Push", "Team Reset")
-//private val lengthOptions = listOf("Short", "Medium", "Long")
-//
-//// ─── Screen ──────────────────────────────────────────────────────────────────
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun CreateMotivationScreen(
-//    mainBackStack: SnapshotStateList<Any>
-//) {
-//
-//
-//
-//
-//    var selectedTone by remember { mutableStateOf<String?>(null) }
-//    var selectedPurpose by remember { mutableStateOf<String?>(null) }
-//    var selectedLength by remember { mutableStateOf<String?>(null) }
-//    var contextText by remember { mutableStateOf("") }
-//
-//    val canGenerate = selectedTone != null && selectedPurpose != null && selectedLength != null
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    Text(
-//                        text = "Create Motivation",
-//                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-//                    )
-//                },
-//                navigationIcon = {
-//                    IconButton(onClick = {
-//                        mainBackStack.removeLast()
-//                    }) {
-//                        Icon(
-//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                            contentDescription = "Back"
-//                        )
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = MaterialTheme.colorScheme.surface,
-//                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-//                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-//                )
-//            )
-//        },
-//        containerColor = MaterialTheme.colorScheme.surface
-//    ) { innerPadding ->
-//
-//        BoxWithConstraints(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(innerPadding)
-//        ) {
-//            val horizontalPadding = when {
-//                maxWidth > 600.dp -> maxWidth * 0.1f   // tablet / large screen
-//                else -> 16.dp
-//            }
-//
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(horizontal = horizontalPadding)
-//                    .verticalScroll(rememberScrollState()),
-//                verticalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                // ── Tone ──────────────────────────────────────────────────
-//                SectionLabel(title = "Tone")
-//                ChipGroup(
-//                    options = toneOptions,
-//                    selected = selectedTone,
-//                    onSelect = { selectedTone = it }
-//                )
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                // ── Purpose ───────────────────────────────────────────────
-//                SectionLabel(title = "Purpose")
-//                ChipGroup(
-//                    options = purposeOptions,
-//                    selected = selectedPurpose,
-//                    onSelect = { selectedPurpose = it }
-//                )
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                // ── Length ────────────────────────────────────────────────
-//                SectionLabel(title = "Length")
-//                ChipGroup(
-//                    options = lengthOptions,
-//                    selected = selectedLength,
-//                    onSelect = { selectedLength = it }
-//                )
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                // ── Context text field ────────────────────────────────────
-//                ContextInputField(
-//                    value = contextText,
-//                    onValueChange = { contextText = it }
-//                )
-//
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                // Prompting
-//
-////                val prompting = """
-////                    generate a motivation quote to cheir my team members in a firendly way
-////                """.trimIndent()
-//
-//                val prompt = """
-//                    Generate 5 team motivation messages.
-//
-//                        Tone: $selectedTone
-//                        Purpose: $selectedPurpose
-//                        Length: $selectedLength
-//                        Context: $contextText
-//
-//                        Rules:
-//                        - Return ONLY JSON
-//                        - Format must be: {"motivations": ["...", "..."]}
-//                        - No explanation, no extra text
-//                        - Each item must be unique
-//                        - Follow tone, purpose and length strictly
-//                    """.trimIndent()
-//
-//                // ── Generate button ───────────────────────────────────────
-//                GenerateButton(
-//                    enabled = canGenerate,
-//                    onClick = {
-////                        aiViewModel.generateMotivation(prompt)
-////                        if (aiViewModel.uiState.isNotEmpty()) {
-////                            val lists = parseMotivations(aiViewModel.uiState)
-////                            lists.forEach { item ->
-////                                // TODO to add motivation quotes
-////                                Log.d("AIViewModel", item.toString())
-////                            }
-////                        }
-//
-//                        mainBackStack.add(GeneratedMotivationScreen)
-//
-//                    }
-//                )
-//                Spacer(modifier = Modifier.height(24.dp))
-//            }
-//        }
-//    }
-//}
-//
-//// ─── Section Label ────────────────────────────────────────────────────────────
-//
-//@Composable
-//private fun SectionLabel(title: String) {
-//    Text(
-//        text = title,
-//        style = MaterialTheme.typography.titleMedium.copy(
-//            fontWeight = FontWeight.Bold,
-//            fontSize = 18.sp
-//        ),
-//        color = MaterialTheme.colorScheme.onSurface,
-//        modifier = Modifier.padding(vertical = 4.dp)
-//    )
-//}
-//
-//// ─── Chip Group ───────────────────────────────────────────────────────────────
-//
-//@Composable
-//private fun ChipGroup(
-//    options: List<String>,
-//    selected: String?,
-//    onSelect: (String) -> Unit
-//) {
-//    // Wrap chips with a simple flow-like layout using FlowRow
-//    FlowRow(
-//        horizontalArrangement = Arrangement.spacedBy(8.dp),
-//        verticalArrangement = Arrangement.spacedBy(8.dp),
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        options.forEach { option ->
-//            SelectableChip(
-//                label = option,
-//                isSelected = option == selected,
-//                onClick = { onSelect(option) }
-//            )
-//        }
-//    }
-//}
-//
-//// ─── Selectable Chip ──────────────────────────────────────────────────────────
-//
-//@Composable
-//private fun SelectableChip(
-//    label: String,
-//    isSelected: Boolean,
-//    onClick: () -> Unit
-//) {
-//    val backgroundColor by animateColorAsState(
-//        targetValue = if (isSelected) MaterialTheme.colorScheme.primary
-//        else MaterialTheme.colorScheme.surfaceVariant,
-//        animationSpec = tween(durationMillis = 250),
-//        label = "chipBackground"
-//    )
-//
-//    val contentColor by animateColorAsState(
-//        targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
-//        else MaterialTheme.colorScheme.onSurfaceVariant,
-//        animationSpec = tween(durationMillis = 250),
-//        label = "chipContent"
-//    )
-//
-//    Surface(
-//        onClick = onClick,
-//        shape = RoundedCornerShape(50),
-//        color = backgroundColor,
-//        tonalElevation = if (isSelected) 0.dp else 1.dp,
-//        shadowElevation = if (isSelected) 4.dp else 0.dp,
-//        modifier = Modifier.wrapContentSize()
-//    ) {
-//        Text(
-//            text = label,
-//            color = contentColor,
-//            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-//        )
-//    }
-//}
-//
-//// ─── Context Input Field ──────────────────────────────────────────────────────
-//
-//@Composable
-//private fun ContextInputField(
-//    value: String,
-//    onValueChange: (String) -> Unit
-//) {
-//    Surface(
-//        shape = RoundedCornerShape(16.dp),
-//        color = MaterialTheme.colorScheme.surfaceVariant,
-//        tonalElevation = 1.dp,
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .defaultMinSize(minHeight = 130.dp)
-//    ) {
-//        TextField(
-//            value = value,
-//            onValueChange = onValueChange,
-//            placeholder = {
-//                Text(
-//                    text = "Context For Ai (optional)",
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-//                    style = MaterialTheme.typography.bodyMedium
-//                )
-//            },
-//            colors = TextFieldDefaults.colors(
-//                focusedContainerColor = Color.Transparent,
-//                unfocusedContainerColor = Color.Transparent,
-//                disabledContainerColor = Color.Transparent,
-//                focusedIndicatorColor = Color.Transparent,
-//                unfocusedIndicatorColor = Color.Transparent,
-//                disabledIndicatorColor = Color.Transparent,
-//                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-//                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-//            ),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .defaultMinSize(minHeight = 130.dp),
-//            maxLines = 8
-//        )
-//    }
-//}
-//
-//// ─── Generate Button ──────────────────────────────────────────────────────────
-//
-//@Composable
-//private fun GenerateButton(
-//    enabled: Boolean,
-//    onClick: () -> Unit
-//) {
-//    Button(
-//        onClick = onClick,
-//        enabled = enabled,
-//        shape = RoundedCornerShape(50),
-//        colors = ButtonDefaults.buttonColors(
-//            containerColor = MaterialTheme.colorScheme.primary,
-//            contentColor = MaterialTheme.colorScheme.onPrimary,
-//            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-//            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-//        ),
-//        elevation = ButtonDefaults.buttonElevation(
-//            defaultElevation = 4.dp,
-//
-//            ),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .height(56.dp)
-//    ) {
-//        Text(
-//            text = "Generate Motivation",
-//            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-//            letterSpacing = 0.5.sp
-//        )
-//    }
-//}
-
-
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -372,6 +41,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
@@ -379,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 
-//// ─── Options ─────────────────────────────────────────────────────────────────
+// ─── Options ─────────────────────────────────────────────────────────────────
 
 private val toneOptions = listOf("Motivational", "Encouraging", "Positive", "Uplifting", "Friendly")
 private val purposeOptions = listOf("Welcome", "Remainder", "Appreciation", "Push", "Team Reset")
@@ -389,27 +59,193 @@ private val lengthOptions = listOf("Short", "Medium", "Long")
 
 private enum class MotivationViewState { CREATE, GENERATED }
 
-// ─── Root Screen (Entry Point) ───────────────────────────────────────────────
+// ─── Root Screen ─────────────────────────────────────────────────────────────
+//
+//@Composable
+//fun CreateMotivationScreen(
+//    mainBackStack: SnapshotStateList<Any>
+//) {
+//    val aiViewModel: AiViewModel = viewModel()
+//
+//    // ── Form state ───────────────────────────────────────────────────────────
+//    var selectedTone by remember { mutableStateOf<String?>(null) }
+//    var selectedPurpose by remember { mutableStateOf<String?>(null) }
+//    var selectedLength by remember { mutableStateOf<String?>(null) }
+//    var contextText by remember { mutableStateOf("") }
+//    var viewState by remember { mutableStateOf(MotivationViewState.CREATE) }
+//
+//    // ── Observe ViewModel ────────────────────────────────────────────────────
+//    val parsedMotivations = aiViewModel.parsedMotivations
+//    val isLoading = aiViewModel.isLoading
+//    val errorMessage = aiViewModel.errorMessage
+//
+//    // ── Status bar control ───────────────────────────────────────────────────
+//    val view = LocalView.current
+//    val isGenerated = viewState == MotivationViewState.GENERATED
+//
+//    SideEffect {
+//        val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
+//        if (isGenerated) {
+//            WindowCompat.setDecorFitsSystemWindows(window, false)
+//            WindowInsetsControllerCompat(window, view).apply {
+//                hide(WindowInsetsCompat.Type.statusBars())
+//                systemBarsBehavior =
+//                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//            }
+//        } else {
+//            WindowCompat.setDecorFitsSystemWindows(window, true)
+//            WindowInsetsControllerCompat(window, view)
+//                .show(WindowInsetsCompat.Type.statusBars())
+//        }
+//    }
+//
+//    // ── Auto-navigate when real data is ready ────────────────────────────────
+//    LaunchedEffect(parsedMotivations) {
+//        if (parsedMotivations.isNotEmpty()) {
+//            viewState = MotivationViewState.GENERATED
+//        }
+//    }
+//
+//    // ── Show error via Snackbar ───────────────────────────────────────────────
+//    val snackbarHostState = remember { SnackbarHostState() }
+//    LaunchedEffect(errorMessage) {
+//        if (errorMessage != null) {
+//            snackbarHostState.showSnackbar(
+//                message = errorMessage,
+//                duration = SnackbarDuration.Short
+//            )
+//            aiViewModel.clearError()
+//        }
+//    }
+//
+//    // ── Root Box (holds content + Snackbar) ──────────────────────────────────
+//    Box(modifier = Modifier.fillMaxSize()) {
+//
+//        // ── Slide transition ─────────────────────────────────────────────────
+//        AnimatedContent(
+//            targetState = viewState,
+//            transitionSpec = {
+//                if (targetState == MotivationViewState.GENERATED) {
+//                    // CREATE → GENERATED : slide up
+//                    (slideInVertically(
+//                        initialOffsetY = { it },
+//                        animationSpec = tween(520, easing = EaseOutQuart)
+//                    ) + fadeIn(tween(400))) togetherWith
+//                            (slideOutVertically(
+//                                targetOffsetY = { -it / 3 },
+//                                animationSpec = tween(400, easing = EaseInQuart)
+//                            ) + fadeOut(tween(300)))
+//                } else {
+//                    // GENERATED → CREATE : slide down
+//                    (slideInVertically(
+//                        initialOffsetY = { -it / 3 },
+//                        animationSpec = tween(520, easing = EaseOutQuart)
+//                    ) + fadeIn(tween(400))) togetherWith
+//                            (slideOutVertically(
+//                                targetOffsetY = { it },
+//                                animationSpec = tween(400, easing = EaseInQuart)
+//                            ) + fadeOut(tween(300)))
+//                }
+//            },
+//            label = "screenTransition"
+//        ) { state ->
+//
+//            // Build prompt here so it always has fresh values
+//            val prompt = """
+//                Generate 5 team motivation messages.
+//                Tone: $selectedTone
+//                Purpose: $selectedPurpose
+//                Length: $selectedLength
+//                Context: $contextText
+//                Rules:
+//                - Return ONLY JSON
+//                - Format must be: {"motivations": ["...", "..."]}
+//                - No explanation, no extra text
+//                - Each item must be unique
+//                - Follow tone, purpose and length strictly
+//            """.trimIndent()
+//
+//            when (state) {
+//
+//                // ── CREATE form ───────────────────────────────────────────
+//                MotivationViewState.CREATE -> {
+//                    CreateFormContent(
+//                        selectedTone = selectedTone,
+//                        selectedPurpose = selectedPurpose,
+//                        selectedLength = selectedLength,
+//                        contextText = contextText,
+//                        isLoading = isLoading,
+//                        onToneSelect = { selectedTone = it },
+//                        onPurposeSelect = { selectedPurpose = it },
+//                        onLengthSelect = { selectedLength = it },
+//                        onContextChange = { contextText = it },
+//                        onBack = { mainBackStack.removeLast() },
+//                        onGenerate = {
+//                            aiViewModel.generateMotivation(prompt)
+//                        }
+//                    )
+//                }
+//
+//                // ── GENERATED screen ──────────────────────────────────────
+//                MotivationViewState.GENERATED -> {
+//                    GeneraterMotivationSCreen(
+//
+//                        motivations = parsedMotivations,
+//                        onBack = {
+//                            aiViewModel.reset()
+//                            viewState = MotivationViewState.CREATE
+//                        },
+//                        onRegenerate = {
+//                            aiViewModel.regenerateMotivation()
+//                        },
+//                        onSendToTeam = { /* TODO: send to Firestore */ }
+//                    )
+//                }
+//            }
+//        }
+//
+//        // ── Snackbar ─────────────────────────────────────────────────────────
+//        SnackbarHost(
+//            hostState = snackbarHostState,
+//            modifier = Modifier.align(Alignment.BottomCenter)
+//        )
+//    }
+//}
+
+// ─── Root Screen ─────────────────────────────────────────────────────────────
 
 @Composable
 fun CreateMotivationScreen(
     mainBackStack: SnapshotStateList<Any>
 ) {
+    val aiViewModel: AiViewModel = viewModel()
 
-    val generateButtonOnClick = remember { mutableStateOf(false) }
-
-    // ── Form state ───────────────────────────────────────────────────────────
     var selectedTone by remember { mutableStateOf<String?>(null) }
     var selectedPurpose by remember { mutableStateOf<String?>(null) }
     var selectedLength by remember { mutableStateOf<String?>(null) }
     var contextText by remember { mutableStateOf("") }
     var viewState by remember { mutableStateOf(MotivationViewState.CREATE) }
 
-    // ── Status bar control ───────────────────────────────────────────────────
+    val parsedMotivations = aiViewModel.parsedMotivations
+    val isLoading = aiViewModel.isLoading
+    val isRegenerating = aiViewModel.isRegenerating
+    val errorMessage = aiViewModel.errorMessage
+
+    // ── Keep a local snapshot of motivations ──────────────────────────────────
+    // This prevents crash during exit animation when reset() clears the list
+    var stableMotivations by remember { mutableStateOf<List<RecentMotivation>>(emptyList()) }
+
+    // ── Only update stableMotivations when list is NOT empty ─────────────────
+    LaunchedEffect(parsedMotivations) {
+        if (parsedMotivations.isNotEmpty()) {
+            stableMotivations = parsedMotivations  // ✅ Never goes empty mid-animation
+            viewState = MotivationViewState.GENERATED
+        }
+    }
+
     val view = LocalView.current
     val isGenerated = viewState == MotivationViewState.GENERATED
 
-    val aiViewModel: AiViewModel = viewModel()
     SideEffect {
         val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
         if (isGenerated) {
@@ -426,107 +262,102 @@ fun CreateMotivationScreen(
         }
     }
 
-    // ── Slide transition ─────────────────────────────────────────────────────
-    AnimatedContent(
-        targetState = viewState,
-        transitionSpec = {
-            if (targetState == MotivationViewState.GENERATED) {
-                // CREATE → GENERATED : slide up
-                (slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = tween(520, easing = EaseOutQuart)
-                ) + fadeIn(tween(400))) togetherWith
-                        (slideOutVertically(
-                            targetOffsetY = { -it / 3 },
-                            animationSpec = tween(400, easing = EaseInQuart)
-                        ) + fadeOut(tween(300)))
-            } else {
-                // GENERATED → CREATE : slide down
-                (slideInVertically(
-                    initialOffsetY = { -it / 3 },
-                    animationSpec = tween(520, easing = EaseOutQuart)
-                ) + fadeIn(tween(400))) togetherWith
-                        (slideOutVertically(
-                            targetOffsetY = { it },
-                            animationSpec = tween(400, easing = EaseInQuart)
-                        ) + fadeOut(tween(300)))
-            }
-        },
-        label = "screenTransition"
-    ) { state ->
-        val prompt = """
-                    Generate 5 team motivation messages.
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(errorMessage) {
+        if (errorMessage != null) {
+            snackbarHostState.showSnackbar(
+                message = errorMessage,
+                duration = SnackbarDuration.Short
+            )
+            aiViewModel.clearError()
+        }
+    }
 
-                        Tone: $selectedTone
-                        Purpose: $selectedPurpose
-                        Length: $selectedLength
-                        Context: $contextText
+    Box(modifier = Modifier.fillMaxSize()) {
 
-                        Rules:
-                        - Return ONLY JSON
-                        - Format must be: {"motivations": ["...", "..."]}
-                        - No explanation, no extra text
-                        - Each item must be unique
-                        - Follow tone, purpose and length strictly
-                    """.trimIndent()
-        when (state) {
-            MotivationViewState.CREATE -> {
-                CreateFormContent(
-                    selectedTone = selectedTone,
-                    selectedPurpose = selectedPurpose,
-                    selectedLength = selectedLength,
-                    contextText = contextText,
-                    onToneSelect = { selectedTone = it },
-                    onPurposeSelect = { selectedPurpose = it },
-                    onLengthSelect = { selectedLength = it },
-                    onContextChange = { contextText = it },
-                    onBack = { mainBackStack.removeLast() },
-                    onGenerate = {
-                        aiViewModel.generateMotivation(prompt)
+        AnimatedContent(
+            targetState = viewState,
+            transitionSpec = {
+                if (targetState == MotivationViewState.GENERATED) {
+                    (slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(520, easing = EaseOutQuart)
+                    ) + fadeIn(tween(400))) togetherWith
+                            (slideOutVertically(
+                                targetOffsetY = { -it / 3 },
+                                animationSpec = tween(400, easing = EaseInQuart)
+                            ) + fadeOut(tween(300)))
+                } else {
+                    (slideInVertically(
+                        initialOffsetY = { -it / 3 },
+                        animationSpec = tween(520, easing = EaseOutQuart)
+                    ) + fadeIn(tween(400))) togetherWith
+                            (slideOutVertically(
+                                targetOffsetY = { it },
+                                animationSpec = tween(400, easing = EaseInQuart)
+                            ) + fadeOut(tween(300)))
+                }
+            },
+            label = "screenTransition"
+        ) { state ->
 
-                        generateButtonOnClick.value = true
+            val prompt = """
+                Generate 5 team motivation messages.
+                Tone: $selectedTone
+                Purpose: $selectedPurpose
+                Length: $selectedLength
+                Context: $contextText
+                Rules:
+                - Return ONLY JSON
+                - Format must be: {"motivations": ["...", "..."]}
+                - No explanation, no extra text
+                - Each item must be unique
+                - Follow tone, purpose and length strictly
+            """.trimIndent()
 
+            when (state) {
+                MotivationViewState.CREATE -> {
+                    CreateFormContent(
+                        selectedTone = selectedTone,
+                        selectedPurpose = selectedPurpose,
+                        selectedLength = selectedLength,
+                        contextText = contextText,
+                        isLoading = isLoading,
+                        onToneSelect = { selectedTone = it },
+                        onPurposeSelect = { selectedPurpose = it },
+                        onLengthSelect = { selectedLength = it },
+                        onContextChange = { contextText = it },
+                        onBack = { mainBackStack.removeLast() },
+                        onGenerate = { aiViewModel.generateMotivation(prompt) }
+                    )
+                }
 
+                MotivationViewState.GENERATED -> {
+                    // ✅ Guard: only show if list is safe
+                    if (stableMotivations.isNotEmpty()) {
+                        GeneraterMotivationSCreen(
+                            motivations = stableMotivations,  // ✅ Use stable copy
+                            isRegenerating = isRegenerating,
+                            onBack = {
+                                // ✅ First switch state, THEN reset
+                                // This way exit animation uses stableMotivations
+                                // and reset() clearing parsedMotivations won't matter
+                                viewState = MotivationViewState.CREATE
+                                aiViewModel.reset()
+                            },
+                            onSendToTeam = { /* TODO */ },
+                            onRegenerate = { aiViewModel.regenerateMotivation() }
+                        )
                     }
-                )
-            }
-
-
-            MotivationViewState.GENERATED -> {
-                GeneraterMotivationSCreen(
-                    // TODO Generaed list had to be added here
-                    motivations = sampleMotivationsss,
-                    onBack = { viewState = MotivationViewState.CREATE },
-                    onSendToTeam = { /* handle send */ }
-                )
+                }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
-    if (generateButtonOnClick.value) {
-
-
-        if (aiViewModel.uiState.isNotEmpty()) {
-            val lists = parseMotivations(aiViewModel.uiState)
-
-
-
-            lists.forEach { item ->
-                // TODO to add motivation quotes
-//                                 TODO to FIrebase Firestore should add selected tone , selectedpurpose and selected lengthh and contextText
-                viewState = MotivationViewState.GENERATED
-
-
-                Log.d("AIViewModel", item.toString())
-                generateButtonOnClick.value = false
-
-            }
-
-        }
-
-    } else {
-        generateButtonOnClick.value = false
-    }
-
 }
 
 // ─── Create Form Content ──────────────────────────────────────────────────────
@@ -538,6 +369,7 @@ private fun CreateFormContent(
     selectedPurpose: String?,
     selectedLength: String?,
     contextText: String,
+    isLoading: Boolean,
     onToneSelect: (String) -> Unit,
     onPurposeSelect: (String) -> Unit,
     onLengthSelect: (String) -> Unit,
@@ -545,7 +377,11 @@ private fun CreateFormContent(
     onBack: () -> Unit,
     onGenerate: () -> Unit
 ) {
-    val canGenerate = selectedTone != null && selectedPurpose != null && selectedLength != null
+    // Disable button while loading OR if not all options selected
+    val canGenerate = selectedTone != null &&
+            selectedPurpose != null &&
+            selectedLength != null &&
+            !isLoading
 
     Scaffold(
         topBar = {
@@ -592,7 +428,6 @@ private fun CreateFormContent(
             ) {
                 Spacer(Modifier.height(8.dp))
 
-                // ── Tone ──────────────────────────────────────────────────
                 FormSectionLabel("Tone")
                 FormChipGroup(
                     options = toneOptions,
@@ -602,7 +437,6 @@ private fun CreateFormContent(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Purpose ───────────────────────────────────────────────
                 FormSectionLabel("Purpose")
                 FormChipGroup(
                     options = purposeOptions,
@@ -612,7 +446,6 @@ private fun CreateFormContent(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Length ────────────────────────────────────────────────
                 FormSectionLabel("Length")
                 FormChipGroup(
                     options = lengthOptions,
@@ -622,7 +455,6 @@ private fun CreateFormContent(
 
                 Spacer(Modifier.height(8.dp))
 
-                // ── Context ───────────────────────────────────────────────
                 FormContextInputField(
                     value = contextText,
                     onValueChange = onContextChange
@@ -630,9 +462,9 @@ private fun CreateFormContent(
 
                 Spacer(Modifier.height(16.dp))
 
-                // ── Generate ──────────────────────────────────────────────
                 FormGenerateButton(
                     enabled = canGenerate,
+                    isLoading = isLoading,
                     onClick = onGenerate
                 )
 
@@ -641,21 +473,246 @@ private fun CreateFormContent(
         }
     }
 }
+//
+//@Composable
+//fun GeneraterMotivationSCreen(
+//    motivations: List<RecentMotivation>,
+//    isRegenerating: Boolean = false,          // ✅ Added
+//    onBack: () -> Unit = {},
+//    onSendToTeam: (RecentMotivation) -> Unit = {},
+//    onRegenerate: () -> Unit = {}
+//) {
+//    var currentIndex by remember { mutableIntStateOf(0) }
+//    var isForward by remember { mutableStateOf(true) }
+//    var dragOffset by remember { mutableFloatStateOf(0f) }
+//    val swipeThreshold = 80f
+//
+//    // ── Reset index when new motivations arrive ───────────────────────────────
+//    LaunchedEffect(motivations) {
+//        currentIndex = 0
+//    }
+//
+//    val currentMotivation = motivations[currentIndex]
+//    val gradientColors = gradientForTone(currentMotivation.toneColor)
+//
+//    val animColor1 by animateColorAsState(
+//        gradientColors[0],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c1"
+//    )
+//    val animColor2 by animateColorAsState(
+//        gradientColors[1],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c2"
+//    )
+//    val animColor3 by animateColorAsState(
+//        gradientColors[2],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c3"
+//    )
+//
+//    val animatedDragOffset by animateFloatAsState(
+//        targetValue = dragOffset,
+//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+//        label = "drag"
+//    )
+//
+//    fun goNext() {
+//        if (currentIndex < motivations.lastIndex) {
+//            isForward = true; currentIndex++
+//        }; dragOffset = 0f
+//    }
+//
+//    fun goPrev() {
+//        if (currentIndex > 0) {
+//            isForward = false; currentIndex--
+//        }; dragOffset = 0f
+//    }
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
+//            .pointerInput(currentIndex) {
+//                detectHorizontalDragGestures(
+//                    onDragEnd = {
+//                        when {
+//                            dragOffset < -swipeThreshold -> goNext()
+//                            dragOffset > swipeThreshold -> goPrev()
+//                            else -> dragOffset = 0f
+//                        }
+//                    },
+//                    onDragCancel = { dragOffset = 0f },
+//                    onHorizontalDrag = { _, amount ->
+//                        val new = dragOffset + amount
+//                        dragOffset = when {
+//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
+//                            new > 0 && currentIndex == 0 -> new * 0.2f
+//                            else -> new.coerceIn(-300f, 300f)
+//                        }
+//                    }
+//                )
+//            }
+//    ) {
+//        QuoteDecorativeCircles(animColor1, animColor3)
+//
+//        SwipeHintOverlay(
+//            dragOffset = animatedDragOffset,
+//            canGoNext = currentIndex < motivations.lastIndex,
+//            canGoPrev = currentIndex > 0
+//        )
+//
+//        // ── Back button ───────────────────────────────────────────────────────
+//        IconButton(
+//            onClick = onBack,
+//            modifier = Modifier
+//                .align(Alignment.TopStart)
+//                .statusBarsPadding()
+//                .padding(start = 16.dp, top = 12.dp)
+//                .size(44.dp)
+//                .shadow(12.dp, CircleShape)
+//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
+//        ) {
+//            Icon(
+//                Icons.Default.ArrowBack,
+//                "Back",
+//                tint = Color.White,
+//                modifier = Modifier.size(22.dp)
+//            )
+//        }
+//
+//        // ── Slide quote cards ─────────────────────────────────────────────────
+//        val enterAnim = if (isForward)
+//            slideInHorizontally(
+//                initialOffsetX = { it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//        else
+//            slideInHorizontally(
+//                initialOffsetX = { -it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//
+//        val exitAnim = if (isForward)
+//            slideOutHorizontally(
+//                targetOffsetX = { -it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//        else
+//            slideOutHorizontally(
+//                targetOffsetX = { it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//
+//        AnimatedContent(
+//            targetState = currentIndex,
+//            transitionSpec = { enterAnim togetherWith exitAnim },
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .padding(horizontal = 28.dp)
+//                .offset(y = (-20).dp),
+//            label = "quote"
+//        ) { idx ->
+//            QuoteCard(motivations[idx])
+//        }
+//
+//        // ── Bottom area ───────────────────────────────────────────────────────
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .navigationBarsPadding()
+//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.spacedBy(20.dp)
+//        ) {
+//            AnimatedVisibility(
+//                visible = dragOffset == 0f,
+//                enter = fadeIn(tween(300)),
+//                exit = fadeOut(tween(200))
+//            ) {
+//                Text(
+//                    "swipe to explore",
+//                    fontSize = 12.sp,
+//                    color = Color.White.copy(alpha = 0.50f),
+//                    fontWeight = FontWeight.Medium,
+//                    letterSpacing = 1.5.sp
+//                )
+//            }
+//
+//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                // ── Regenerate button ─────────────────────────────────────────
+//                RegenerateButton(
+//                    isLoading = isRegenerating,
+//                    onClick = onRegenerate
+//                )
+//
+//                // ── Send to team button ───────────────────────────────────────
+//                SendToTeamButton { onSendToTeam(currentMotivation) }
+//            }
+//        }
+//
+//        // ── Regenerating overlay ──────────────────────────────────────────────
+//        AnimatedVisibility(
+//            visible = isRegenerating,
+//            enter = fadeIn(tween(300)),
+//            exit = fadeOut(tween(300)),
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Black.copy(alpha = 0.45f)),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.spacedBy(16.dp)
+//                ) {
+//                    CircularProgressIndicator(
+//                        color = Color.White,
+//                        strokeWidth = 3.dp,
+//                        modifier = Modifier.size(48.dp)
+//                    )
+//                    Text(
+//                        text = "Regenerating...",
+//                        color = Color.White,
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
 
-// ─── Generated Quote Screen ───────────────────────────────────────────────────
+
 
 @Composable
 fun GeneraterMotivationSCreen(
-    motivations: List<RecentMotivation> = sampleMotivationsss,
+    motivations: List<RecentMotivation>,
+    isRegenerating: Boolean = false,
     onBack: () -> Unit = {},
-    onSendToTeam: (RecentMotivation) -> Unit = {}
+    onSendToTeam: (RecentMotivation) -> Unit = {},
+    onRegenerate: () -> Unit = {}
 ) {
-    val aiViewModel: AiViewModel = viewModel()
+
+    if (motivations.isEmpty()) return
 
     var currentIndex by remember { mutableIntStateOf(0) }
     var isForward by remember { mutableStateOf(true) }
     var dragOffset by remember { mutableFloatStateOf(0f) }
     val swipeThreshold = 80f
+
+    // ── Reset index when new motivations arrive after regenerate ──────────────
+    LaunchedEffect(motivations) {
+        currentIndex = 0
+    }
 
     val currentMotivation = motivations[currentIndex]
     val gradientColors = gradientForTone(currentMotivation.toneColor)
@@ -719,17 +776,15 @@ fun GeneraterMotivationSCreen(
                 )
             }
     ) {
-        // ── Decorative bg ────────────────────────────────────────────────────
         QuoteDecorativeCircles(animColor1, animColor3)
 
-        // ── Swipe glow ───────────────────────────────────────────────────────
         SwipeHintOverlay(
             dragOffset = animatedDragOffset,
             canGoNext = currentIndex < motivations.lastIndex,
             canGoPrev = currentIndex > 0
         )
 
-        // ── Back ─────────────────────────────────────────────────────────────
+        // ── Back button ───────────────────────────────────────────────────────
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -748,30 +803,30 @@ fun GeneraterMotivationSCreen(
             )
         }
 
-
-
+        // ── Slide quote cards ─────────────────────────────────────────────────
         val enterAnim = if (isForward)
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> fullWidth },
+                initialOffsetX = { it },
                 animationSpec = tween(500, easing = EaseOutQuart)
             ) + fadeIn(tween(400))
         else
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> -fullWidth },
+                initialOffsetX = { -it },
                 animationSpec = tween(500, easing = EaseOutQuart)
             ) + fadeIn(tween(400))
 
         val exitAnim = if (isForward)
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> -fullWidth },
+                targetOffsetX = { -it },
                 animationSpec = tween(400, easing = EaseInQuart)
             ) + fadeOut(tween(300))
         else
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> fullWidth },
+                targetOffsetX = { it },
                 animationSpec = tween(400, easing = EaseInQuart)
             ) + fadeOut(tween(300))
 
+        // ── Quote card OR shimmer ─────────────────────────────────────────────
         AnimatedContent(
             targetState = currentIndex,
             transitionSpec = { enterAnim togetherWith exitAnim },
@@ -781,10 +836,15 @@ fun GeneraterMotivationSCreen(
                 .offset(y = (-20).dp),
             label = "quote"
         ) { idx ->
-            QuoteCard(motivations[idx])
+            // ✅ Show shimmer placeholder instead of quote while regenerating
+            if (isRegenerating) {
+                ShimmerQuotePlaceholder()
+            } else {
+                QuoteCard(motivations[idx])
+            }
         }
 
-        // ── Bottom ────────────────────────────────────────────────────────────
+        // ── Bottom area ───────────────────────────────────────────────────────
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -794,7 +854,7 @@ fun GeneraterMotivationSCreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             AnimatedVisibility(
-                visible = dragOffset == 0f,
+                visible = dragOffset == 0f && !isRegenerating,
                 enter = fadeIn(tween(300)),
                 exit = fadeOut(tween(200))
             ) {
@@ -807,19 +867,435 @@ fun GeneraterMotivationSCreen(
                 )
             }
 
-            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+            // ✅ Show shimmer dots while regenerating
+            if (isRegenerating) {
+                ShimmerDotIndicators()
+            } else {
+                QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
+                RegenerateButton(
+                    isLoading = isRegenerating,
+                    onClick = onRegenerate
+                )
                 SendToTeamButton { onSendToTeam(currentMotivation) }
             }
         }
     }
 }
+
+//
+//@Composable
+//fun GeneraterMotivationSCreen(
+//    motivations: List<RecentMotivation>,
+//    isRegenerating: Boolean = false,          // ✅ Added
+//    onBack: () -> Unit = {},
+//    onSendToTeam: (RecentMotivation) -> Unit = {},
+//    onRegenerate: () -> Unit = {}
+//) {
+//
+//    if (motivations.isEmpty()) return
+//
+//    var currentIndex by remember { mutableIntStateOf(0) }
+//    var isForward by remember { mutableStateOf(true) }
+//    var dragOffset by remember { mutableFloatStateOf(0f) }
+//
+//    // ✅ Reset index when new motivations arrive after regenerate
+//    LaunchedEffect(motivations) {
+//        currentIndex = 0
+//    }
+////    var currentIndex by remember { mutableIntStateOf(0) }
+////    var isForward by remember { mutableStateOf(true) }
+////    var dragOffset by remember { mutableFloatStateOf(0f) }
+//    val swipeThreshold = 80f
+//
+//    // ── Reset index when new motivations arrive ───────────────────────────────
+//    LaunchedEffect(motivations) {
+//        currentIndex = 0
+//    }
+//
+//    val currentMotivation = motivations[currentIndex]
+//    val gradientColors = gradientForTone(currentMotivation.toneColor)
+//
+//    val animColor1 by animateColorAsState(
+//        gradientColors[0],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c1"
+//    )
+//    val animColor2 by animateColorAsState(
+//        gradientColors[1],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c2"
+//    )
+//    val animColor3 by animateColorAsState(
+//        gradientColors[2],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c3"
+//    )
+//
+//    val animatedDragOffset by animateFloatAsState(
+//        targetValue = dragOffset,
+//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+//        label = "drag"
+//    )
+//
+//    fun goNext() {
+//        if (currentIndex < motivations.lastIndex) {
+//            isForward = true; currentIndex++
+//        }; dragOffset = 0f
+//    }
+//
+//    fun goPrev() {
+//        if (currentIndex > 0) {
+//            isForward = false; currentIndex--
+//        }; dragOffset = 0f
+//    }
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
+//            .pointerInput(currentIndex) {
+//                detectHorizontalDragGestures(
+//                    onDragEnd = {
+//                        when {
+//                            dragOffset < -swipeThreshold -> goNext()
+//                            dragOffset > swipeThreshold -> goPrev()
+//                            else -> dragOffset = 0f
+//                        }
+//                    },
+//                    onDragCancel = { dragOffset = 0f },
+//                    onHorizontalDrag = { _, amount ->
+//                        val new = dragOffset + amount
+//                        dragOffset = when {
+//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
+//                            new > 0 && currentIndex == 0 -> new * 0.2f
+//                            else -> new.coerceIn(-300f, 300f)
+//                        }
+//                    }
+//                )
+//            }
+//    ) {
+//        QuoteDecorativeCircles(animColor1, animColor3)
+//
+//        SwipeHintOverlay(
+//            dragOffset = animatedDragOffset,
+//            canGoNext = currentIndex < motivations.lastIndex,
+//            canGoPrev = currentIndex > 0
+//        )
+//
+//        // ── Back button ───────────────────────────────────────────────────────
+//        IconButton(
+//            onClick = onBack,
+//            modifier = Modifier
+//                .align(Alignment.TopStart)
+//                .statusBarsPadding()
+//                .padding(start = 16.dp, top = 12.dp)
+//                .size(44.dp)
+//                .shadow(12.dp, CircleShape)
+//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
+//        ) {
+//            Icon(
+//                Icons.Default.ArrowBack,
+//                "Back",
+//                tint = Color.White,
+//                modifier = Modifier.size(22.dp)
+//            )
+//        }
+//
+//        // ── Slide quote cards ─────────────────────────────────────────────────
+//        val enterAnim = if (isForward)
+//            slideInHorizontally(
+//                initialOffsetX = { it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//        else
+//            slideInHorizontally(
+//                initialOffsetX = { -it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//
+//        val exitAnim = if (isForward)
+//            slideOutHorizontally(
+//                targetOffsetX = { -it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//        else
+//            slideOutHorizontally(
+//                targetOffsetX = { it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//
+//        AnimatedContent(
+//            targetState = currentIndex,
+//            transitionSpec = { enterAnim togetherWith exitAnim },
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .padding(horizontal = 28.dp)
+//                .offset(y = (-20).dp),
+//            label = "quote"
+//        ) { idx ->
+//            QuoteCard(motivations[idx])
+//        }
+//
+//        // ── Bottom area ───────────────────────────────────────────────────────
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .navigationBarsPadding()
+//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.spacedBy(20.dp)
+//        ) {
+//            AnimatedVisibility(
+//                visible = dragOffset == 0f,
+//                enter = fadeIn(tween(300)),
+//                exit = fadeOut(tween(200))
+//            ) {
+//                Text(
+//                    "swipe to explore",
+//                    fontSize = 12.sp,
+//                    color = Color.White.copy(alpha = 0.50f),
+//                    fontWeight = FontWeight.Medium,
+//                    letterSpacing = 1.5.sp
+//                )
+//            }
+//
+//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                // ── Regenerate button ─────────────────────────────────────────
+//                RegenerateButton(
+//                    isLoading = isRegenerating,
+//                    onClick = onRegenerate
+//                )
+//
+//                // ── Send to team button ───────────────────────────────────────
+//                SendToTeamButton { onSendToTeam(currentMotivation) }
+//            }
+//        }
+//
+//        // ── Regenerating overlay ──────────────────────────────────────────────
+//        AnimatedVisibility(
+//            visible = isRegenerating,
+//            enter = fadeIn(tween(300)),
+//            exit = fadeOut(tween(300)),
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.Black.copy(alpha = 0.45f)),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.spacedBy(16.dp)
+//                ) {
+//                    CircularProgressIndicator(
+//                        color = Color.White,
+//                        strokeWidth = 3.dp,
+//                        modifier = Modifier.size(48.dp)
+//                    )
+//                    Text(
+//                        text = "Regenerating...",
+//                        color = Color.White,
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+
+// ─── Generated Quote Screen ───────────────────────────────────────────────────
+//
+//@Composable
+//fun GeneraterMotivationSCreen(
+//    motivations: List<RecentMotivation>,
+//    onBack: () -> Unit = {},
+//    onSendToTeam: (RecentMotivation) -> Unit = {},
+//    onRegenerate: () -> Unit = {}               // ✅ Add this
+//) {
+//    var currentIndex by remember { mutableIntStateOf(0) }
+//    var isForward by remember { mutableStateOf(true) }
+//    var dragOffset by remember { mutableFloatStateOf(0f) }
+//    val swipeThreshold = 80f
+//
+//    val currentMotivation = motivations[currentIndex]
+//    val gradientColors = gradientForTone(currentMotivation.toneColor)
+//
+//    val animColor1 by animateColorAsState(
+//        gradientColors[0],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c1"
+//    )
+//    val animColor2 by animateColorAsState(
+//        gradientColors[1],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c2"
+//    )
+//    val animColor3 by animateColorAsState(
+//        gradientColors[2],
+//        tween(700, easing = EaseInOutCubic),
+//        label = "c3"
+//    )
+//
+//    val animatedDragOffset by animateFloatAsState(
+//        targetValue = dragOffset,
+//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+//        label = "drag"
+//    )
+//
+//    fun goNext() {
+//        if (currentIndex < motivations.lastIndex) {
+//            isForward = true; currentIndex++
+//        }; dragOffset = 0f
+//    }
+//
+//    fun goPrev() {
+//        if (currentIndex > 0) {
+//            isForward = false; currentIndex--
+//        }; dragOffset = 0f
+//    }
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
+//            .pointerInput(currentIndex) {
+//                detectHorizontalDragGestures(
+//                    onDragEnd = {
+//                        when {
+//                            dragOffset < -swipeThreshold -> goNext()
+//                            dragOffset > swipeThreshold -> goPrev()
+//                            else -> dragOffset = 0f
+//                        }
+//                    },
+//                    onDragCancel = { dragOffset = 0f },
+//                    onHorizontalDrag = { _, amount ->
+//                        val new = dragOffset + amount
+//                        dragOffset = when {
+//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
+//                            new > 0 && currentIndex == 0 -> new * 0.2f
+//                            else -> new.coerceIn(-300f, 300f)
+//                        }
+//                    }
+//                )
+//            }
+//    ) {
+//        QuoteDecorativeCircles(animColor1, animColor3)
+//        SwipeHintOverlay(
+//            dragOffset = animatedDragOffset,
+//            canGoNext = currentIndex < motivations.lastIndex,
+//            canGoPrev = currentIndex > 0
+//        )
+//
+//        // ── Back button ───────────────────────────────────────────────────────
+//        IconButton(
+//            onClick = onBack,
+//            modifier = Modifier
+//                .align(Alignment.TopStart)
+//                .statusBarsPadding()
+//                .padding(start = 16.dp, top = 12.dp)
+//                .size(44.dp)
+//                .shadow(12.dp, CircleShape)
+//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
+//        ) {
+//            Icon(
+//                Icons.Default.ArrowBack,
+//                "Back",
+//                tint = Color.White,
+//                modifier = Modifier.size(22.dp)
+//            )
+//        }
+//
+//        // ── Slide quote cards ─────────────────────────────────────────────────
+//        val enterAnim = if (isForward)
+//            slideInHorizontally(
+//                initialOffsetX = { it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//        else
+//            slideInHorizontally(
+//                initialOffsetX = { -it },
+//                animationSpec = tween(500, easing = EaseOutQuart)
+//            ) + fadeIn(tween(400))
+//
+//        val exitAnim = if (isForward)
+//            slideOutHorizontally(
+//                targetOffsetX = { -it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//        else
+//            slideOutHorizontally(
+//                targetOffsetX = { it },
+//                animationSpec = tween(400, easing = EaseInQuart)
+//            ) + fadeOut(tween(300))
+//
+//
+//        AnimatedContent(
+//            targetState = currentIndex,
+//            transitionSpec = { enterAnim togetherWith exitAnim },
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .padding(horizontal = 28.dp)
+//                .offset(y = (-20).dp),
+//            label = "quote"
+//        ) { idx ->
+//            QuoteCard(motivations[idx])
+//        }
+//
+//        // ── Bottom area ───────────────────────────────────────────────────────
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .navigationBarsPadding()
+//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.spacedBy(20.dp)
+//        ) {
+//            AnimatedVisibility(
+//                visible = dragOffset == 0f,
+//                enter = fadeIn(tween(300)),
+//                exit = fadeOut(tween(200))
+//            ) {
+//                Text(
+//                    "swipe to explore",
+//                    fontSize = 12.sp,
+//                    color = Color.White.copy(alpha = 0.50f),
+//                    fontWeight = FontWeight.Medium,
+//                    letterSpacing = 1.5.sp
+//                )
+//            }
+//
+//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                SendToTeamButton { onSendToTeam(currentMotivation) }
+//
+//                /// -------- adding Regenerating Button
+//                RegenerateButton(onClick = onRegenerate)
+//
+//            }
+//        }
+//    }
+//}
+
 
 // ─── Form Sub-Composables ─────────────────────────────────────────────────────
 
@@ -933,13 +1409,15 @@ private fun FormContextInputField(
 }
 
 @Composable
-private fun FormGenerateButton(enabled: Boolean, onClick: () -> Unit) {
-    // Pulse animation to draw attention when enabled
-    // initilizing Ai View Model
+private fun FormGenerateButton(
+    enabled: Boolean,
+    isLoading: Boolean,
+    onClick: () -> Unit
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (enabled) 1.02f else 1f,
+        targetValue = if (enabled && !isLoading) 1.02f else 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(900, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse
@@ -963,11 +1441,31 @@ private fun FormGenerateButton(enabled: Boolean, onClick: () -> Unit) {
             .height(56.dp)
             .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
     ) {
-        Text(
-            text = "Generate Motivation ✨",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            letterSpacing = 0.5.sp
-        )
+        if (isLoading) {
+            // ── Loading state ─────────────────────────────────────────────
+            CircularProgressIndicator(
+                modifier = Modifier.size(20.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "Generating...",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                letterSpacing = 0.5.sp
+            )
+        } else {
+            // ── Idle state ────────────────────────────────────────────────
+            Text(
+                text = "Generate Motivation ✨",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                letterSpacing = 0.5.sp
+            )
+        }
     }
 }
 
@@ -1011,51 +1509,7 @@ fun QuoteCard(motivation: RecentMotivation) {
     }
 }
 
-@Composable
-fun ToneBadge(emoji: String, tone: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(Color.White.copy(alpha = 0.18f))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Text(emoji, fontSize = 14.sp)
-        Text(tone, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
-    }
-}
-
-@Composable
-fun SenderChip(sentBy: String, timeAgo: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(Color.White.copy(alpha = 0.15f))
-            .padding(horizontal = 14.dp, vertical = 8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-                .background(Color.White.copy(alpha = 0.30f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                sentBy.first().toString(),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-        Column {
-            Text(sentBy, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(timeAgo, fontSize = 10.sp, color = Color.White.copy(alpha = 0.70f))
-        }
-    }
-}
-
+// send to team button
 @Composable
 fun SendToTeamButton(onClick: () -> Unit) {
     var isPressed by remember { mutableStateOf(false) }
@@ -1083,6 +1537,7 @@ fun SendToTeamButton(onClick: () -> Unit) {
     }
 }
 
+// Progress dot
 @Composable
 fun QuoteDotIndicators(total: Int, currentIndex: Int) {
     Row(
@@ -1111,6 +1566,7 @@ fun QuoteDotIndicators(total: Int, currentIndex: Int) {
     }
 }
 
+// swipe hint overlay
 @Composable
 fun SwipeHintOverlay(dragOffset: Float, canGoNext: Boolean, canGoPrev: Boolean) {
     val nextAlpha =
@@ -1127,10 +1583,7 @@ fun SwipeHintOverlay(dragOffset: Float, canGoNext: Boolean, canGoPrev: Boolean) 
                     .align(Alignment.CenterEnd)
                     .background(
                         Brush.horizontalGradient(
-                            listOf(
-                                Color.Transparent,
-                                Color.White.copy(alpha = nextAlpha)
-                            )
+                            listOf(Color.Transparent, Color.White.copy(alpha = nextAlpha))
                         )
                     )
             )
@@ -1143,10 +1596,7 @@ fun SwipeHintOverlay(dragOffset: Float, canGoNext: Boolean, canGoPrev: Boolean) 
                     .align(Alignment.CenterStart)
                     .background(
                         Brush.horizontalGradient(
-                            listOf(
-                                Color.White.copy(alpha = prevAlpha),
-                                Color.Transparent
-                            )
+                            listOf(Color.White.copy(alpha = prevAlpha), Color.Transparent)
                         )
                     )
             )
@@ -1154,6 +1604,7 @@ fun SwipeHintOverlay(dragOffset: Float, canGoNext: Boolean, canGoPrev: Boolean) 
     }
 }
 
+// progress
 @Composable
 fun QuoteDecorativeCircles(darkColor: Color, lightColor: Color) {
     Box(Modifier.fillMaxSize()) {
@@ -1163,12 +1614,8 @@ fun QuoteDecorativeCircles(darkColor: Color, lightColor: Color) {
                 .offset(x = 80.dp, y = (-80).dp)
                 .align(Alignment.TopEnd)
                 .background(
-                    Brush.radialGradient(
-                        listOf(
-                            lightColor.copy(alpha = 0.28f),
-                            Color.Transparent
-                        )
-                    ), CircleShape
+                    Brush.radialGradient(listOf(lightColor.copy(alpha = 0.28f), Color.Transparent)),
+                    CircleShape
                 )
         )
         Box(
@@ -1177,12 +1624,8 @@ fun QuoteDecorativeCircles(darkColor: Color, lightColor: Color) {
                 .offset(x = (-60).dp, y = 50.dp)
                 .align(Alignment.BottomStart)
                 .background(
-                    Brush.radialGradient(
-                        listOf(
-                            darkColor.copy(alpha = 0.32f),
-                            Color.Transparent
-                        )
-                    ), CircleShape
+                    Brush.radialGradient(listOf(darkColor.copy(alpha = 0.32f), Color.Transparent)),
+                    CircleShape
                 )
         )
         Box(
@@ -1195,13 +1638,14 @@ fun QuoteDecorativeCircles(darkColor: Color, lightColor: Color) {
                             Color.White.copy(alpha = 0.05f),
                             Color.Transparent
                         )
-                    ), CircleShape
+                    ),
+                    CircleShape
                 )
         )
     }
 }
 
-// ─── Gradient Helper ─────────────────────────────────────────────────────────
+// ─── Gradient Helper ──────────────────────────────────────────────────────────
 
 fun gradientForTone(toneColor: String): List<Color> = when (toneColor.lowercase()) {
     "purple" -> listOf(Color(0xFF6A5ACD), Color(0xFF9B8FE0), Color(0xFFB8A9FF))
@@ -1217,45 +1661,130 @@ fun gradientForTone(toneColor: String): List<Color> = when (toneColor.lowercase(
     else -> listOf(Color(0xFF6A5ACD), Color(0xFF9B8FE0), Color(0xFFB8A9FF))
 }
 
-// ─── Sample Data ─────────────────────────────────────────────────────────────
 
-val sampleMotivationsss = listOf(
-    RecentMotivation(
-        1, "Inspirational", "purple",
-        "Your Positive attitude and dedication are the cornerstones of our success. Keep pushing boundaries and inspiring those around you. Every small step you take today is a giant leap towards our collective goals.",
-        "🚀"
-    ),
-    RecentMotivation(
-        2, "Encouraging", "blue",
-        "Believe in yourself and all that you are. Know that there is something inside you that is greater than any challenge, any obstacle, any setback you may face today.",
-        "💪"
-    ),
-    RecentMotivation(
-        3, "Bold", "violet",
-        "Success is not final, failure is not fatal: It is the courage to continue that counts. Rise up, show up, and never give up on the vision you hold in your heart.",
-        "🔥"
-    ),
-    RecentMotivation(
-        4, "Calm", "green",
-        "The secret of getting ahead is getting started. Your consistency today builds the extraordinary tomorrow. You are capable of far more than you imagine.",
-        "🌿"
-    ),
-    RecentMotivation(
-        5, "Energetic", "orange",
-        "Champions are not made in gyms. Champions are made from something deep inside them — a desire, a dream, a vision. Push yourself because no one else will do it for you.",
-        "⚡"
-    ),
-    RecentMotivation(
-        6, "Focused", "indigo",
-        "Do not watch the clock; do what it does — keep going. Your hard work is building something magnificent, brick by brick, day by day. The team believes in you.",
-        "🎯"
-    ),
-    RecentMotivation(
-        7, "Resilient", "pink",
-        "Strength does not come from winning. Your struggles develop your strengths. When you go through hardships and decide not to surrender, that is strength.",
-        "💎"
-    ),
-)
+//------------------------ Regenerate Button------------------------------------
 
+//@Composable
+//fun RegenerateButton(
+//    onClick: () -> Unit,
+//    isLoading: Boolean = false
+//) {
+//    var isPressed by remember { mutableStateOf(false) }
+//
+//    val scale by animateFloatAsState(
+//        targetValue = if (isPressed) 0.94f else 1f,
+//        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+//        label = "regenScale"
+//    )
+//
+//    // Spin animation while regenerating
+//    val infiniteTransition = rememberInfiniteTransition(label = "spin")
+//    val rotation by infiniteTransition.animateFloat(
+//        initialValue = 0f,
+//        targetValue = if (isLoading) 360f else 0f,
+//        animationSpec = infiniteRepeatable(
+//            animation = tween(800, easing = LinearEasing),
+//            repeatMode = RepeatMode.Restart
+//        ),
+//        label = "rotation"
+//    )
+//
+//    Button(
+//        onClick = {
+//            if (!isLoading) {
+//                isPressed = true
+//                onClick()
+//                isPressed = false
+//            }
+//        },
+//        shape = RoundedCornerShape(50),
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = Color.White.copy(alpha = 0.22f),
+//            contentColor = Color.White
+//        ),
+//        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+//        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
+//        modifier = Modifier
+//            .shadow(16.dp, RoundedCornerShape(50))
+//            .graphicsLayer { scaleX = scale; scaleY = scale }
+//    ) {
+//        Icon(
+//            imageVector = Icons.Default.Refresh,
+//            contentDescription = "Regenerate",
+//            modifier = Modifier
+//                .size(15.dp)
+//                .graphicsLayer { rotationZ = if (isLoading) rotation else 0f },
+//            tint = Color.White
+//        )
+//        Spacer(Modifier.width(8.dp))
+//        Text(
+//            text = if (isLoading) "Regenerating..." else "Regenerate",
+//            fontWeight = FontWeight.Bold,
+//            fontSize = 14.sp,
+//            letterSpacing = 0.3.sp
+//        )
+//    }
+//}
+@Composable
+fun RegenerateButton(
+    onClick: () -> Unit,
+    isLoading: Boolean = false
+) {
+    var isPressed by remember { mutableStateOf(false) }
 
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+        label = "regenScale"
+    )
+
+    // ── Spin animation while regenerating ─────────────────────────────────────
+    val infiniteTransition = rememberInfiniteTransition(label = "spin")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotation"
+    )
+
+    Button(
+        onClick = {
+            if (!isLoading) {
+                isPressed = true
+                onClick()
+                isPressed = false
+            }
+        },
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White.copy(alpha = 0.22f),
+            contentColor = Color.White
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
+        modifier = Modifier
+            .shadow(16.dp, RoundedCornerShape(50))
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+    ) {
+        Icon(
+            imageVector = Icons.Default.Refresh,
+            contentDescription = "Regenerate",
+            tint = Color.White,
+            modifier = Modifier
+                .size(15.dp)
+                // ✅ Only spin when loading
+                .graphicsLayer { rotationZ = if (isLoading) rotation else 0f }
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = if (isLoading) "Regenerating..." else "Regenerate",
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            letterSpacing = 0.3.sp
+        )
+    }
+}
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -61,124 +62,6 @@ import com.example.aimotivationapp.Screens.HomeScreens.Utils.sampleMotivations
 import com.google.firebase.auth.FirebaseAuth
 
 
-
-//@Composable
-//fun TeamHeadScreen(
-////    userName: String = "Alex",
-//    mainNavigation : SnapshotStateList<Any>
-////    motivations: List<RecentMotivation> = sampleMotivations,
-////    onCreateMotivation: () -> Unit = {},
-////    onSettings: () -> Unit = {},
-//) {
-//
-//    val context = LocalContext.current
-//    val repo = remember {
-//        UserRepository(UserPreferences(context))
-//    }
-//
-//    val viewModel: PreferenceSavingViewModel = viewModel(
-//        factory = PreferenceViewModelFactory(repo)
-//    )
-//
-//    val userName = viewModel.userName.collectAsState().value.toString()
-//
-//    val motivation = sampleMotivations // TODO from the firebase firestore list data
-//
-//    val colorScheme = MaterialTheme.colorScheme
-//
-//    val firebaseAuth = FirebaseAuth.getInstance()
-//    // Local mutable list so deletions update the UI instantly
-//    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
-//
-//    Scaffold(containerColor = colorScheme.background) { padding ->
-//        LazyColumn(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(padding),
-//            contentPadding = PaddingValues(bottom = 48.dp),
-//        ) {
-//
-//            // ── Hero header with gradient blob background
-//            item {
-//                HeroHeader(
-//                    userName = userName,
-//                    onSettings = {
-//                        firebaseAuth.signOut()
-//                        viewModel.clearData()
-//                        mainNavigation.add(LoginScreen)
-//                        mainNavigation.remove(TeamHeadScreen)
-//                    },
-//                    onCreateMotivation = {
-//                        // TODO Generate motivation Screen
-//                    },
-//                )
-//            }
-//
-//            // ── Section label
-//            item {
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(start = 24.dp, end = 24.dp, top = 32.dp, bottom = 4.dp),
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.SpaceBetween,
-//                ) {
-//                    Text(
-//                        "Recent Motivations",
-//                        style = MaterialTheme.typography.titleLarge.copy(
-//                            fontWeight = FontWeight.ExtraBold,
-//                            letterSpacing = (-0.5).sp,
-//                        ),
-//                        color = colorScheme.onBackground,
-//                    )
-//                    Surface(shape = CircleShape, color = colorScheme.primaryContainer) {
-//                        Text(
-//                            "${motivationList.size}",
-//                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-//                            color = colorScheme.onPrimaryContainer,
-//                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-//                        )
-//                    }
-//                }
-//            }
-//
-//            // ── Hint text
-//            if (motivationList.isEmpty()) {
-//                item {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(top = 60.dp),
-//                        contentAlignment = Alignment.Center,
-//                    ) {
-//                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                            Text("🎉", fontSize = 40.sp)
-//                            Spacer(Modifier.height(12.dp))
-//                            Text(
-//                                "No motivations yet.\nCreate one for your team!",
-//                                style = MaterialTheme.typography.bodyMedium,
-//                                color = colorScheme.onSurfaceVariant,
-//                                textAlign = TextAlign.Center,
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//
-//            // ── Motivation cards  (swipe-to-delete enabled)
-//            items(motivationList, key = { it.id }) { motivation ->
-//                Spacer(Modifier.height(12.dp))
-//                SwipeToDeleteWrapper(
-//                    onDelete = { motivationList.remove(motivation) },
-//                ) {
-//                    MotivationCard(motivation)
-//                }
-//            }
-//        }
-//    }
-//}
-
-
 @Composable
 fun TeamHeadScreen(
     mainNavigation: SnapshotStateList<Any>
@@ -211,7 +94,11 @@ fun TeamHeadScreen(
 
     val contentMaxWidth = if (screenWidth > 600) 700.dp else Dp.Unspecified
 
-    Scaffold(containerColor = colorScheme.background) { padding ->
+    Scaffold(
+        containerColor = colorScheme.background,
+        contentWindowInsets = WindowInsets(0)
+    )
+    { padding ->
 
         Box(
             modifier = Modifier
@@ -307,7 +194,7 @@ fun TeamHeadScreen(
                 // ── Motivation cards
                 items(motivationList, key = { it.id }) { motivation ->
 
-                    Spacer(Modifier.height(12.dp))
+//                    Spacer(Modifier.height(12.dp))
 
                     SwipeToDeleteWrapper(
                         onDelete = { motivationList.remove(motivation) }
@@ -330,85 +217,6 @@ enum class MotivationTone(val label: String, val emoji: String) {
     Bold("Bold", "🔥"),
 }
 
-
-@Composable
-private fun StepLabel(number: String, label: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                number,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold),
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-            color = MaterialTheme.colorScheme.onBackground
-        )
-    }
-}
-
-
-
-@Composable
-private fun GeneratedMotivationCard(text: String, team: String, onSend: () -> Unit, onRegenerate: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        elevation = CardDefaults.cardElevation(0.dp),
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Icon(Icons.Default.AutoAwesome, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                Text(
-                    "For ${team.ifBlank { "your team" }}",
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium, lineHeight = 22.sp, fontStyle = FontStyle.Italic),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            Spacer(Modifier.height(18.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedButton(
-                    onClick = onRegenerate,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onPrimaryContainer),
-                ) {
-                    Icon(Icons.Default.Refresh, null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Retry")
-                }
-                Button(
-                    onClick = onSend,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
-                ) {
-                    Icon(Icons.Default.Send, null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Send", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

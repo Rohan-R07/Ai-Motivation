@@ -79,9 +79,7 @@ fun MainNavigation() {
                 TeamHeadLoginScreen(backStack)
             }
 
-//            entry<GeneratedMotivationScreen> {
-//                GeneratedMotivationQuoteScreen {  }
-//            }
+
         }
     )
 }
