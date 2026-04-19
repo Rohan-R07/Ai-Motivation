@@ -1,6 +1,8 @@
 package com.example.aimotivationapp.Screens.GenerateMotivation
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -44,9 +46,19 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
+import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
+import com.example.aimotivationapp.Datastore.UserPreferences
+import com.example.aimotivationapp.Datastore.UserRepository
+import com.example.aimotivationapp.MainNavigation.CreateMotivation
+import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
+import com.google.firebase.auth.FirebaseAuth
+import kotlin.math.log
 
 
 // ─── Options ─────────────────────────────────────────────────────────────────
@@ -60,164 +72,20 @@ private val lengthOptions = listOf("Short", "Medium", "Long")
 private enum class MotivationViewState { CREATE, GENERATED }
 
 // ─── Root Screen ─────────────────────────────────────────────────────────────
-//
-//@Composable
-//fun CreateMotivationScreen(
-//    mainBackStack: SnapshotStateList<Any>
-//) {
-//    val aiViewModel: AiViewModel = viewModel()
-//
-//    // ── Form state ───────────────────────────────────────────────────────────
-//    var selectedTone by remember { mutableStateOf<String?>(null) }
-//    var selectedPurpose by remember { mutableStateOf<String?>(null) }
-//    var selectedLength by remember { mutableStateOf<String?>(null) }
-//    var contextText by remember { mutableStateOf("") }
-//    var viewState by remember { mutableStateOf(MotivationViewState.CREATE) }
-//
-//    // ── Observe ViewModel ────────────────────────────────────────────────────
-//    val parsedMotivations = aiViewModel.parsedMotivations
-//    val isLoading = aiViewModel.isLoading
-//    val errorMessage = aiViewModel.errorMessage
-//
-//    // ── Status bar control ───────────────────────────────────────────────────
-//    val view = LocalView.current
-//    val isGenerated = viewState == MotivationViewState.GENERATED
-//
-//    SideEffect {
-//        val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
-//        if (isGenerated) {
-//            WindowCompat.setDecorFitsSystemWindows(window, false)
-//            WindowInsetsControllerCompat(window, view).apply {
-//                hide(WindowInsetsCompat.Type.statusBars())
-//                systemBarsBehavior =
-//                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//            }
-//        } else {
-//            WindowCompat.setDecorFitsSystemWindows(window, true)
-//            WindowInsetsControllerCompat(window, view)
-//                .show(WindowInsetsCompat.Type.statusBars())
-//        }
-//    }
-//
-//    // ── Auto-navigate when real data is ready ────────────────────────────────
-//    LaunchedEffect(parsedMotivations) {
-//        if (parsedMotivations.isNotEmpty()) {
-//            viewState = MotivationViewState.GENERATED
-//        }
-//    }
-//
-//    // ── Show error via Snackbar ───────────────────────────────────────────────
-//    val snackbarHostState = remember { SnackbarHostState() }
-//    LaunchedEffect(errorMessage) {
-//        if (errorMessage != null) {
-//            snackbarHostState.showSnackbar(
-//                message = errorMessage,
-//                duration = SnackbarDuration.Short
-//            )
-//            aiViewModel.clearError()
-//        }
-//    }
-//
-//    // ── Root Box (holds content + Snackbar) ──────────────────────────────────
-//    Box(modifier = Modifier.fillMaxSize()) {
-//
-//        // ── Slide transition ─────────────────────────────────────────────────
-//        AnimatedContent(
-//            targetState = viewState,
-//            transitionSpec = {
-//                if (targetState == MotivationViewState.GENERATED) {
-//                    // CREATE → GENERATED : slide up
-//                    (slideInVertically(
-//                        initialOffsetY = { it },
-//                        animationSpec = tween(520, easing = EaseOutQuart)
-//                    ) + fadeIn(tween(400))) togetherWith
-//                            (slideOutVertically(
-//                                targetOffsetY = { -it / 3 },
-//                                animationSpec = tween(400, easing = EaseInQuart)
-//                            ) + fadeOut(tween(300)))
-//                } else {
-//                    // GENERATED → CREATE : slide down
-//                    (slideInVertically(
-//                        initialOffsetY = { -it / 3 },
-//                        animationSpec = tween(520, easing = EaseOutQuart)
-//                    ) + fadeIn(tween(400))) togetherWith
-//                            (slideOutVertically(
-//                                targetOffsetY = { it },
-//                                animationSpec = tween(400, easing = EaseInQuart)
-//                            ) + fadeOut(tween(300)))
-//                }
-//            },
-//            label = "screenTransition"
-//        ) { state ->
-//
-//            // Build prompt here so it always has fresh values
-//            val prompt = """
-//                Generate 5 team motivation messages.
-//                Tone: $selectedTone
-//                Purpose: $selectedPurpose
-//                Length: $selectedLength
-//                Context: $contextText
-//                Rules:
-//                - Return ONLY JSON
-//                - Format must be: {"motivations": ["...", "..."]}
-//                - No explanation, no extra text
-//                - Each item must be unique
-//                - Follow tone, purpose and length strictly
-//            """.trimIndent()
-//
-//            when (state) {
-//
-//                // ── CREATE form ───────────────────────────────────────────
-//                MotivationViewState.CREATE -> {
-//                    CreateFormContent(
-//                        selectedTone = selectedTone,
-//                        selectedPurpose = selectedPurpose,
-//                        selectedLength = selectedLength,
-//                        contextText = contextText,
-//                        isLoading = isLoading,
-//                        onToneSelect = { selectedTone = it },
-//                        onPurposeSelect = { selectedPurpose = it },
-//                        onLengthSelect = { selectedLength = it },
-//                        onContextChange = { contextText = it },
-//                        onBack = { mainBackStack.removeLast() },
-//                        onGenerate = {
-//                            aiViewModel.generateMotivation(prompt)
-//                        }
-//                    )
-//                }
-//
-//                // ── GENERATED screen ──────────────────────────────────────
-//                MotivationViewState.GENERATED -> {
-//                    GeneraterMotivationSCreen(
-//
-//                        motivations = parsedMotivations,
-//                        onBack = {
-//                            aiViewModel.reset()
-//                            viewState = MotivationViewState.CREATE
-//                        },
-//                        onRegenerate = {
-//                            aiViewModel.regenerateMotivation()
-//                        },
-//                        onSendToTeam = { /* TODO: send to Firestore */ }
-//                    )
-//                }
-//            }
-//        }
-//
-//        // ── Snackbar ─────────────────────────────────────────────────────────
-//        SnackbarHost(
-//            hostState = snackbarHostState,
-//            modifier = Modifier.align(Alignment.BottomCenter)
-//        )
-//    }
-//}
 
-// ─── Root Screen ─────────────────────────────────────────────────────────────
-
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun CreateMotivationScreen(
     mainBackStack: SnapshotStateList<Any>
 ) {
+
+    val context = LocalContext.current
+
+
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val currentEmail = firebaseAuth.currentUser?.email.toString()
+
+
     val aiViewModel: AiViewModel = viewModel()
 
     var selectedTone by remember { mutableStateOf<String?>(null) }
@@ -231,7 +99,9 @@ fun CreateMotivationScreen(
     val isRegenerating = aiViewModel.isRegenerating
     val errorMessage = aiViewModel.errorMessage
 
-    // ── Keep a local snapshot of motivations ──────────────────────────────────
+    val uploadFetchViewModel : UploadFetchMotivationQuotes = viewModel()
+
+
     // This prevents crash during exit animation when reset() clears the list
     var stableMotivations by remember { mutableStateOf<List<RecentMotivation>>(emptyList()) }
 
@@ -333,19 +203,33 @@ fun CreateMotivationScreen(
                 }
 
                 MotivationViewState.GENERATED -> {
-                    // ✅ Guard: only show if list is safe
                     if (stableMotivations.isNotEmpty()) {
                         GeneraterMotivationSCreen(
-                            motivations = stableMotivations,  // ✅ Use stable copy
+                            motivations = stableMotivations,
                             isRegenerating = isRegenerating,
                             onBack = {
-                                // ✅ First switch state, THEN reset
-                                // This way exit animation uses stableMotivations
-                                // and reset() clearing parsedMotivations won't matter
                                 viewState = MotivationViewState.CREATE
                                 aiViewModel.reset()
                             },
-                            onSendToTeam = { /* TODO */ },
+                            onSendToTeam = { motivation ->
+                                // TODO FIREBASE FIRESTORE UPLOADING IS DONE RIGHT HERE
+
+                                Log.d("CreateMotivationScreen",motivation.message)
+                                Log.d("CreateMotivationScreen",motivation.tone)
+
+
+                                uploadFetchViewModel.addMotivation(
+                                    email = currentEmail.trim(),
+                                    quote = motivation.message,
+                                    tone = motivation.tone,
+                                    onSucesses = {
+                                        mainBackStack.add(TeamHeadScreen)
+                                        mainBackStack.remove(CreateMotivation)
+                                    }
+                                )
+
+
+                            },
                             onRegenerate = { aiViewModel.regenerateMotivation() }
                         )
                     }
@@ -473,225 +357,6 @@ private fun CreateFormContent(
         }
     }
 }
-//
-//@Composable
-//fun GeneraterMotivationSCreen(
-//    motivations: List<RecentMotivation>,
-//    isRegenerating: Boolean = false,          // ✅ Added
-//    onBack: () -> Unit = {},
-//    onSendToTeam: (RecentMotivation) -> Unit = {},
-//    onRegenerate: () -> Unit = {}
-//) {
-//    var currentIndex by remember { mutableIntStateOf(0) }
-//    var isForward by remember { mutableStateOf(true) }
-//    var dragOffset by remember { mutableFloatStateOf(0f) }
-//    val swipeThreshold = 80f
-//
-//    // ── Reset index when new motivations arrive ───────────────────────────────
-//    LaunchedEffect(motivations) {
-//        currentIndex = 0
-//    }
-//
-//    val currentMotivation = motivations[currentIndex]
-//    val gradientColors = gradientForTone(currentMotivation.toneColor)
-//
-//    val animColor1 by animateColorAsState(
-//        gradientColors[0],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c1"
-//    )
-//    val animColor2 by animateColorAsState(
-//        gradientColors[1],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c2"
-//    )
-//    val animColor3 by animateColorAsState(
-//        gradientColors[2],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c3"
-//    )
-//
-//    val animatedDragOffset by animateFloatAsState(
-//        targetValue = dragOffset,
-//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-//        label = "drag"
-//    )
-//
-//    fun goNext() {
-//        if (currentIndex < motivations.lastIndex) {
-//            isForward = true; currentIndex++
-//        }; dragOffset = 0f
-//    }
-//
-//    fun goPrev() {
-//        if (currentIndex > 0) {
-//            isForward = false; currentIndex--
-//        }; dragOffset = 0f
-//    }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
-//            .pointerInput(currentIndex) {
-//                detectHorizontalDragGestures(
-//                    onDragEnd = {
-//                        when {
-//                            dragOffset < -swipeThreshold -> goNext()
-//                            dragOffset > swipeThreshold -> goPrev()
-//                            else -> dragOffset = 0f
-//                        }
-//                    },
-//                    onDragCancel = { dragOffset = 0f },
-//                    onHorizontalDrag = { _, amount ->
-//                        val new = dragOffset + amount
-//                        dragOffset = when {
-//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
-//                            new > 0 && currentIndex == 0 -> new * 0.2f
-//                            else -> new.coerceIn(-300f, 300f)
-//                        }
-//                    }
-//                )
-//            }
-//    ) {
-//        QuoteDecorativeCircles(animColor1, animColor3)
-//
-//        SwipeHintOverlay(
-//            dragOffset = animatedDragOffset,
-//            canGoNext = currentIndex < motivations.lastIndex,
-//            canGoPrev = currentIndex > 0
-//        )
-//
-//        // ── Back button ───────────────────────────────────────────────────────
-//        IconButton(
-//            onClick = onBack,
-//            modifier = Modifier
-//                .align(Alignment.TopStart)
-//                .statusBarsPadding()
-//                .padding(start = 16.dp, top = 12.dp)
-//                .size(44.dp)
-//                .shadow(12.dp, CircleShape)
-//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
-//        ) {
-//            Icon(
-//                Icons.Default.ArrowBack,
-//                "Back",
-//                tint = Color.White,
-//                modifier = Modifier.size(22.dp)
-//            )
-//        }
-//
-//        // ── Slide quote cards ─────────────────────────────────────────────────
-//        val enterAnim = if (isForward)
-//            slideInHorizontally(
-//                initialOffsetX = { it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//        else
-//            slideInHorizontally(
-//                initialOffsetX = { -it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//
-//        val exitAnim = if (isForward)
-//            slideOutHorizontally(
-//                targetOffsetX = { -it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//        else
-//            slideOutHorizontally(
-//                targetOffsetX = { it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//
-//        AnimatedContent(
-//            targetState = currentIndex,
-//            transitionSpec = { enterAnim togetherWith exitAnim },
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//                .padding(horizontal = 28.dp)
-//                .offset(y = (-20).dp),
-//            label = "quote"
-//        ) { idx ->
-//            QuoteCard(motivations[idx])
-//        }
-//
-//        // ── Bottom area ───────────────────────────────────────────────────────
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomCenter)
-//                .navigationBarsPadding()
-//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.spacedBy(20.dp)
-//        ) {
-//            AnimatedVisibility(
-//                visible = dragOffset == 0f,
-//                enter = fadeIn(tween(300)),
-//                exit = fadeOut(tween(200))
-//            ) {
-//                Text(
-//                    "swipe to explore",
-//                    fontSize = 12.sp,
-//                    color = Color.White.copy(alpha = 0.50f),
-//                    fontWeight = FontWeight.Medium,
-//                    letterSpacing = 1.5.sp
-//                )
-//            }
-//
-//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                // ── Regenerate button ─────────────────────────────────────────
-//                RegenerateButton(
-//                    isLoading = isRegenerating,
-//                    onClick = onRegenerate
-//                )
-//
-//                // ── Send to team button ───────────────────────────────────────
-//                SendToTeamButton { onSendToTeam(currentMotivation) }
-//            }
-//        }
-//
-//        // ── Regenerating overlay ──────────────────────────────────────────────
-//        AnimatedVisibility(
-//            visible = isRegenerating,
-//            enter = fadeIn(tween(300)),
-//            exit = fadeOut(tween(300)),
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(Color.Black.copy(alpha = 0.45f)),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    verticalArrangement = Arrangement.spacedBy(16.dp)
-//                ) {
-//                    CircularProgressIndicator(
-//                        color = Color.White,
-//                        strokeWidth = 3.dp,
-//                        modifier = Modifier.size(48.dp)
-//                    )
-//                    Text(
-//                        text = "Regenerating...",
-//                        color = Color.White,
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-
-
 
 @Composable
 fun GeneraterMotivationSCreen(
@@ -888,414 +553,6 @@ fun GeneraterMotivationSCreen(
         }
     }
 }
-
-//
-//@Composable
-//fun GeneraterMotivationSCreen(
-//    motivations: List<RecentMotivation>,
-//    isRegenerating: Boolean = false,          // ✅ Added
-//    onBack: () -> Unit = {},
-//    onSendToTeam: (RecentMotivation) -> Unit = {},
-//    onRegenerate: () -> Unit = {}
-//) {
-//
-//    if (motivations.isEmpty()) return
-//
-//    var currentIndex by remember { mutableIntStateOf(0) }
-//    var isForward by remember { mutableStateOf(true) }
-//    var dragOffset by remember { mutableFloatStateOf(0f) }
-//
-//    // ✅ Reset index when new motivations arrive after regenerate
-//    LaunchedEffect(motivations) {
-//        currentIndex = 0
-//    }
-////    var currentIndex by remember { mutableIntStateOf(0) }
-////    var isForward by remember { mutableStateOf(true) }
-////    var dragOffset by remember { mutableFloatStateOf(0f) }
-//    val swipeThreshold = 80f
-//
-//    // ── Reset index when new motivations arrive ───────────────────────────────
-//    LaunchedEffect(motivations) {
-//        currentIndex = 0
-//    }
-//
-//    val currentMotivation = motivations[currentIndex]
-//    val gradientColors = gradientForTone(currentMotivation.toneColor)
-//
-//    val animColor1 by animateColorAsState(
-//        gradientColors[0],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c1"
-//    )
-//    val animColor2 by animateColorAsState(
-//        gradientColors[1],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c2"
-//    )
-//    val animColor3 by animateColorAsState(
-//        gradientColors[2],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c3"
-//    )
-//
-//    val animatedDragOffset by animateFloatAsState(
-//        targetValue = dragOffset,
-//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-//        label = "drag"
-//    )
-//
-//    fun goNext() {
-//        if (currentIndex < motivations.lastIndex) {
-//            isForward = true; currentIndex++
-//        }; dragOffset = 0f
-//    }
-//
-//    fun goPrev() {
-//        if (currentIndex > 0) {
-//            isForward = false; currentIndex--
-//        }; dragOffset = 0f
-//    }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
-//            .pointerInput(currentIndex) {
-//                detectHorizontalDragGestures(
-//                    onDragEnd = {
-//                        when {
-//                            dragOffset < -swipeThreshold -> goNext()
-//                            dragOffset > swipeThreshold -> goPrev()
-//                            else -> dragOffset = 0f
-//                        }
-//                    },
-//                    onDragCancel = { dragOffset = 0f },
-//                    onHorizontalDrag = { _, amount ->
-//                        val new = dragOffset + amount
-//                        dragOffset = when {
-//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
-//                            new > 0 && currentIndex == 0 -> new * 0.2f
-//                            else -> new.coerceIn(-300f, 300f)
-//                        }
-//                    }
-//                )
-//            }
-//    ) {
-//        QuoteDecorativeCircles(animColor1, animColor3)
-//
-//        SwipeHintOverlay(
-//            dragOffset = animatedDragOffset,
-//            canGoNext = currentIndex < motivations.lastIndex,
-//            canGoPrev = currentIndex > 0
-//        )
-//
-//        // ── Back button ───────────────────────────────────────────────────────
-//        IconButton(
-//            onClick = onBack,
-//            modifier = Modifier
-//                .align(Alignment.TopStart)
-//                .statusBarsPadding()
-//                .padding(start = 16.dp, top = 12.dp)
-//                .size(44.dp)
-//                .shadow(12.dp, CircleShape)
-//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
-//        ) {
-//            Icon(
-//                Icons.Default.ArrowBack,
-//                "Back",
-//                tint = Color.White,
-//                modifier = Modifier.size(22.dp)
-//            )
-//        }
-//
-//        // ── Slide quote cards ─────────────────────────────────────────────────
-//        val enterAnim = if (isForward)
-//            slideInHorizontally(
-//                initialOffsetX = { it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//        else
-//            slideInHorizontally(
-//                initialOffsetX = { -it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//
-//        val exitAnim = if (isForward)
-//            slideOutHorizontally(
-//                targetOffsetX = { -it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//        else
-//            slideOutHorizontally(
-//                targetOffsetX = { it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//
-//        AnimatedContent(
-//            targetState = currentIndex,
-//            transitionSpec = { enterAnim togetherWith exitAnim },
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//                .padding(horizontal = 28.dp)
-//                .offset(y = (-20).dp),
-//            label = "quote"
-//        ) { idx ->
-//            QuoteCard(motivations[idx])
-//        }
-//
-//        // ── Bottom area ───────────────────────────────────────────────────────
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomCenter)
-//                .navigationBarsPadding()
-//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.spacedBy(20.dp)
-//        ) {
-//            AnimatedVisibility(
-//                visible = dragOffset == 0f,
-//                enter = fadeIn(tween(300)),
-//                exit = fadeOut(tween(200))
-//            ) {
-//                Text(
-//                    "swipe to explore",
-//                    fontSize = 12.sp,
-//                    color = Color.White.copy(alpha = 0.50f),
-//                    fontWeight = FontWeight.Medium,
-//                    letterSpacing = 1.5.sp
-//                )
-//            }
-//
-//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                // ── Regenerate button ─────────────────────────────────────────
-//                RegenerateButton(
-//                    isLoading = isRegenerating,
-//                    onClick = onRegenerate
-//                )
-//
-//                // ── Send to team button ───────────────────────────────────────
-//                SendToTeamButton { onSendToTeam(currentMotivation) }
-//            }
-//        }
-//
-//        // ── Regenerating overlay ──────────────────────────────────────────────
-//        AnimatedVisibility(
-//            visible = isRegenerating,
-//            enter = fadeIn(tween(300)),
-//            exit = fadeOut(tween(300)),
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(Color.Black.copy(alpha = 0.45f)),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    verticalArrangement = Arrangement.spacedBy(16.dp)
-//                ) {
-//                    CircularProgressIndicator(
-//                        color = Color.White,
-//                        strokeWidth = 3.dp,
-//                        modifier = Modifier.size(48.dp)
-//                    )
-//                    Text(
-//                        text = "Regenerating...",
-//                        color = Color.White,
-//                        fontSize = 16.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-
-// ─── Generated Quote Screen ───────────────────────────────────────────────────
-//
-//@Composable
-//fun GeneraterMotivationSCreen(
-//    motivations: List<RecentMotivation>,
-//    onBack: () -> Unit = {},
-//    onSendToTeam: (RecentMotivation) -> Unit = {},
-//    onRegenerate: () -> Unit = {}               // ✅ Add this
-//) {
-//    var currentIndex by remember { mutableIntStateOf(0) }
-//    var isForward by remember { mutableStateOf(true) }
-//    var dragOffset by remember { mutableFloatStateOf(0f) }
-//    val swipeThreshold = 80f
-//
-//    val currentMotivation = motivations[currentIndex]
-//    val gradientColors = gradientForTone(currentMotivation.toneColor)
-//
-//    val animColor1 by animateColorAsState(
-//        gradientColors[0],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c1"
-//    )
-//    val animColor2 by animateColorAsState(
-//        gradientColors[1],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c2"
-//    )
-//    val animColor3 by animateColorAsState(
-//        gradientColors[2],
-//        tween(700, easing = EaseInOutCubic),
-//        label = "c3"
-//    )
-//
-//    val animatedDragOffset by animateFloatAsState(
-//        targetValue = dragOffset,
-//        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-//        label = "drag"
-//    )
-//
-//    fun goNext() {
-//        if (currentIndex < motivations.lastIndex) {
-//            isForward = true; currentIndex++
-//        }; dragOffset = 0f
-//    }
-//
-//    fun goPrev() {
-//        if (currentIndex > 0) {
-//            isForward = false; currentIndex--
-//        }; dragOffset = 0f
-//    }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Brush.verticalGradient(listOf(animColor1, animColor2, animColor3)))
-//            .pointerInput(currentIndex) {
-//                detectHorizontalDragGestures(
-//                    onDragEnd = {
-//                        when {
-//                            dragOffset < -swipeThreshold -> goNext()
-//                            dragOffset > swipeThreshold -> goPrev()
-//                            else -> dragOffset = 0f
-//                        }
-//                    },
-//                    onDragCancel = { dragOffset = 0f },
-//                    onHorizontalDrag = { _, amount ->
-//                        val new = dragOffset + amount
-//                        dragOffset = when {
-//                            new < 0 && currentIndex == motivations.lastIndex -> new * 0.2f
-//                            new > 0 && currentIndex == 0 -> new * 0.2f
-//                            else -> new.coerceIn(-300f, 300f)
-//                        }
-//                    }
-//                )
-//            }
-//    ) {
-//        QuoteDecorativeCircles(animColor1, animColor3)
-//        SwipeHintOverlay(
-//            dragOffset = animatedDragOffset,
-//            canGoNext = currentIndex < motivations.lastIndex,
-//            canGoPrev = currentIndex > 0
-//        )
-//
-//        // ── Back button ───────────────────────────────────────────────────────
-//        IconButton(
-//            onClick = onBack,
-//            modifier = Modifier
-//                .align(Alignment.TopStart)
-//                .statusBarsPadding()
-//                .padding(start = 16.dp, top = 12.dp)
-//                .size(44.dp)
-//                .shadow(12.dp, CircleShape)
-//                .background(Color.White.copy(alpha = 0.18f), CircleShape)
-//        ) {
-//            Icon(
-//                Icons.Default.ArrowBack,
-//                "Back",
-//                tint = Color.White,
-//                modifier = Modifier.size(22.dp)
-//            )
-//        }
-//
-//        // ── Slide quote cards ─────────────────────────────────────────────────
-//        val enterAnim = if (isForward)
-//            slideInHorizontally(
-//                initialOffsetX = { it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//        else
-//            slideInHorizontally(
-//                initialOffsetX = { -it },
-//                animationSpec = tween(500, easing = EaseOutQuart)
-//            ) + fadeIn(tween(400))
-//
-//        val exitAnim = if (isForward)
-//            slideOutHorizontally(
-//                targetOffsetX = { -it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//        else
-//            slideOutHorizontally(
-//                targetOffsetX = { it },
-//                animationSpec = tween(400, easing = EaseInQuart)
-//            ) + fadeOut(tween(300))
-//
-//
-//        AnimatedContent(
-//            targetState = currentIndex,
-//            transitionSpec = { enterAnim togetherWith exitAnim },
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//                .padding(horizontal = 28.dp)
-//                .offset(y = (-20).dp),
-//            label = "quote"
-//        ) { idx ->
-//            QuoteCard(motivations[idx])
-//        }
-//
-//        // ── Bottom area ───────────────────────────────────────────────────────
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomCenter)
-//                .navigationBarsPadding()
-//                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.spacedBy(20.dp)
-//        ) {
-//            AnimatedVisibility(
-//                visible = dragOffset == 0f,
-//                enter = fadeIn(tween(300)),
-//                exit = fadeOut(tween(200))
-//            ) {
-//                Text(
-//                    "swipe to explore",
-//                    fontSize = 12.sp,
-//                    color = Color.White.copy(alpha = 0.50f),
-//                    fontWeight = FontWeight.Medium,
-//                    letterSpacing = 1.5.sp
-//                )
-//            }
-//
-//            QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                SendToTeamButton { onSendToTeam(currentMotivation) }
-//
-//                /// -------- adding Regenerating Button
-//                RegenerateButton(onClick = onRegenerate)
-//
-//            }
-//        }
-//    }
-//}
-
 
 // ─── Form Sub-Composables ─────────────────────────────────────────────────────
 
@@ -1659,6 +916,17 @@ fun gradientForTone(toneColor: String): List<Color> = when (toneColor.lowercase(
     "red" -> listOf(Color(0xFF7F0000), Color(0xFFC62828), Color(0xFFEF9A9A))
     "gold" -> listOf(Color(0xFF5D4037), Color(0xFF8D6E63), Color(0xFFFFD54F))
     else -> listOf(Color(0xFF6A5ACD), Color(0xFF9B8FE0), Color(0xFFB8A9FF))
+}
+
+fun mapColorToTone(color: String): String {
+    return when (color.lowercase()) {
+        "purple" -> "Motivational"
+        "blue" -> "Encouraging"
+        "green" -> "Positive"
+        "orange" -> "Uplifting"
+        "pink" -> "Friendly"
+        else -> "Motivational"
+    }
 }
 
 

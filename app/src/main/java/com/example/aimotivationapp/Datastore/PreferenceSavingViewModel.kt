@@ -7,32 +7,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-//class PreferenceSavingViewModel(
-//    private val repo: UserRepository
-//) : ViewModel() {
-//
-//    // 🔥 Reactive name (auto updates UI)
-//    val userName: StateFlow<String?> = repo.getUserName()
-//        .stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(5000),
-//            "null"
-//        )
-//
-//    // 🔹 First time save
-//    fun saveName(name: String) {
-//        viewModelScope.launch {
-//            repo.saveAndUpdateName(name)
-//        }
-//    }
-//
-//    // 🔹 First time save
-//    fun clearName() {
-//        viewModelScope.launch {
-//            repo.clearData()
-//        }
-//    }
-//}
 
 
 

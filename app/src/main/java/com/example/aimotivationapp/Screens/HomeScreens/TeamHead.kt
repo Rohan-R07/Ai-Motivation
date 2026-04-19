@@ -126,8 +126,6 @@ fun TeamHeadScreen(
                         },
                         onCreateMotivation = {
                             mainNavigation.add(CreateMotivation)
-                            // TODO
-
                         }
                     )
                 }
