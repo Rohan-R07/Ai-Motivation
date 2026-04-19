@@ -44,6 +44,7 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.FirebaseFirestore.FirestoreViewModel
 import com.example.aimotivationapp.MainNavigation.FacultyScreen
+import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
 
 @Composable
 fun MotivationSplashScreen(
@@ -55,13 +56,16 @@ fun MotivationSplashScreen(
         UserRepository(UserPreferences(context))
     }
 
+    val uploadingFetchingQuotesViewModel :  UploadFetchMotivationQuotes = viewModel()
+
+
     val viewModel: PreferenceSavingViewModel = viewModel(
         factory = PreferenceViewModelFactory(repo)
     )
 
     val theEnterEmail = viewModel.userEmail.collectAsState().value.toString()
 
-
+    Log.d("preferenceDataStoreEmail",theEnterEmail)
     val colorScheme = MaterialTheme.colorScheme
     val coroutineScope = rememberCoroutineScope()
 
@@ -139,6 +143,8 @@ fun MotivationSplashScreen(
         delay(1000)
 
         Log.d("SplashScreen", "USer Logged In $isUserLoggedIn The Value $theEnterEmail")
+        Log.d("ddddsdsds", "USer Logged In $userEmail")
+
         coroutineScope.launch {
             delay(3000)
             if (isUserLoggedIn && userEmail != "null") {
@@ -148,6 +154,7 @@ fun MotivationSplashScreen(
                         isUserPresent.value = true
                         Log.d("Splashing", "it is true")
                         Log.d("Splashing", firebaseAuth.currentUser?.email.toString())
+//                        uploadingFetchingQuotesViewModel.setUserEmail()
                         mainNavBackStack.add(TeamHeadScreen)
                         mainNavBackStack.remove(SplashScreen)
                         isUserPresent.value = false
