@@ -58,7 +58,9 @@ import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
-import com.example.aimotivationapp.Screens.HomeScreens.Utils.sampleMotivations
+
+import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -75,10 +77,11 @@ fun TeamHeadScreen(
         factory = PreferenceViewModelFactory(repo)
     )
 
+    val fetchingViewModel: UploadFetchMotivationQuotes = viewModel()
     val userName = viewModel.userName.collectAsState().value.toString()
-    val motivation = sampleMotivations
+//    val motivation = sampleMotivations
     val firebaseAuth = FirebaseAuth.getInstance()
-    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
+//    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
 
     val colorScheme = MaterialTheme.colorScheme
 
@@ -91,6 +94,14 @@ fun TeamHeadScreen(
         screenWidth > 400 -> 32.dp   // large phones
         else -> 20.dp                // small phones
     }
+    val currentUserEmail = FirebaseAuth.getInstance()?.currentUser?.email.toString()
+    LaunchedEffect(Unit) {
+        fetchingViewModel.listenMotivations(currentUserEmail)
+    }
+
+
+    val fetchedMotivation = fetchingViewModel.motivations.value
+
 
     val contentMaxWidth = if (screenWidth > 600) 700.dp else Dp.Unspecified
 
@@ -157,7 +168,7 @@ fun TeamHeadScreen(
                             color = colorScheme.primaryContainer
                         ) {
                             Text(
-                                "${motivationList.size}",
+                                "${fetchedMotivation.size}",
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = colorScheme.onPrimaryContainer
@@ -167,7 +178,7 @@ fun TeamHeadScreen(
                 }
 
                 // ── Empty state
-                if (motivationList.isEmpty()) {
+                if (fetchedMotivation.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier
@@ -189,18 +200,21 @@ fun TeamHeadScreen(
                 }
 
                 // TODO ADD Firebase stuff
-                // ── Motivation cards
-                items(motivationList, key = { it.id }) { motivation ->
-
-//                    Spacer(Modifier.height(12.dp))
+                items(fetchedMotivation){ motivation ->
+                    Spacer(Modifier.padding(12.dp))
 
                     SwipeToDeleteWrapper(
-                        onDelete = { motivationList.remove(motivation) }
+                        onDelete = {
+
+                        }
                     ) {
+
                         MotivationCard(motivation)
                     }
                 }
+
             }
+
         }
     }
 }

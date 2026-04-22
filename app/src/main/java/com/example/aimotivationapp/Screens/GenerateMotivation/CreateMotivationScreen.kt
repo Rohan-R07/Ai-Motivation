@@ -79,8 +79,6 @@ fun CreateMotivationScreen(
     mainBackStack: SnapshotStateList<Any>
 ) {
 
-    val context = LocalContext.current
-
 
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentEmail = firebaseAuth.currentUser?.email.toString()
@@ -99,7 +97,7 @@ fun CreateMotivationScreen(
     val isRegenerating = aiViewModel.isRegenerating
     val errorMessage = aiViewModel.errorMessage
 
-    val uploadFetchViewModel : UploadFetchMotivationQuotes = viewModel()
+    val uploadFetchViewModel: UploadFetchMotivationQuotes = viewModel()
 
 
     // This prevents crash during exit animation when reset() clears the list
@@ -214,8 +212,8 @@ fun CreateMotivationScreen(
                             onSendToTeam = { motivation ->
                                 // TODO FIREBASE FIRESTORE UPLOADING IS DONE RIGHT HERE
 
-                                Log.d("CreateMotivationScreen",motivation.message)
-                                Log.d("CreateMotivationScreen",motivation.tone)
+                                Log.d("CreateMotivationScreen", motivation.message)
+                                Log.d("CreateMotivationScreen", motivation.tone)
 
 
                                 uploadFetchViewModel.addMotivation(

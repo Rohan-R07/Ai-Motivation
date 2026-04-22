@@ -343,23 +343,7 @@ fun FacultyScreen(
 
                     emoji = "🔥"
                 ),
-                RecentMotivation(
-                    id = 3,
-                    tone = "Growth",
-                    toneColor = ToneColor.Inspiring.toString(),
-                    message = "Push yourself, because no one else is going to do it for you.",
 
-
-                    emoji = "🌱"
-                ),
-                RecentMotivation(
-                    id = 4,
-                    tone = "Creativity",
-                    toneColor = ToneColor.Bold.toString(),
-                    message = "Your limitation — it's only your imagination.",
-
-                    emoji = "✨"
-                ),
                 RecentMotivation(
                     id = 5,
                     tone = "Leadership",
@@ -375,14 +359,7 @@ fun FacultyScreen(
                     message = "Do something today that your future self will thank you for.",
                     emoji = "🦉"
                 ),
-                RecentMotivation(
-                    id = 7,
-                    tone = "Focus",
-                    toneColor = ToneColor.Inspiring.toString(),
-                    message = "The harder you work for something, the greater you'll feel.",
 
-                    emoji = "🎯"
-                ),
                 RecentMotivation(
                     id = 8,
                     tone = "Success",
