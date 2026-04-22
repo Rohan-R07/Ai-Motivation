@@ -57,6 +57,7 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.CreateMotivation
 import com.example.aimotivationapp.MainNavigation.LoginScreen
+import com.example.aimotivationapp.MainNavigation.SettingsScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.DeleteConfirmationDialog
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
@@ -136,10 +137,7 @@ fun TeamHeadScreen(
                     HeroHeader(
                         userName = userName,
                         onSettings = {
-                            firebaseAuth.signOut()
-                            viewModel.clearData()
-                            mainNavigation.add(LoginScreen)
-                            mainNavigation.remove(TeamHeadScreen)
+                            mainNavigation.add(SettingsScreen)
                         },
                         onCreateMotivation = {
                             mainNavigation.add(CreateMotivation)
@@ -274,7 +272,7 @@ private fun SwipeToDeleteWrapper(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
                 onDelete()
-                true
+                false
             } else false
         },
         positionalThreshold = { totalDistance -> totalDistance * 0.4f },

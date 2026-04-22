@@ -24,12 +24,6 @@ class UploadFetchMotivationQuotes : ViewModel() {
     var addState by mutableStateOf<AddMotivationState>(AddMotivationState.Idle)
         private set
 
-    // input handler
-    fun onInputChange(newQuote: String? = null, newTone: String? = null) {
-        newQuote?.let { quote = it }
-        newTone?.let { tone = it }
-    }
-
     fun addMotivation(
         email: String,
         quote: String,
@@ -114,4 +108,7 @@ class UploadFetchMotivationQuotes : ViewModel() {
                 onFailure(it.message ?: "Delete failed")
             }
     }
+
+
+
 }
