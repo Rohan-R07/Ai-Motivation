@@ -1,5 +1,7 @@
 package com.example.aimotivationapp.Screens.HomeScreens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,8 +58,10 @@ import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.CreateMotivation
 import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.Screens.HomeScreens.Utils.DeleteConfirmationDialog
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
+import com.example.aimotivationapp.UploadBackend.Motivation
 
 import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
 import com.google.firebase.Firebase
@@ -79,11 +83,13 @@ fun TeamHeadScreen(
 
     val fetchingViewModel: UploadFetchMotivationQuotes = viewModel()
     val userName = viewModel.userName.collectAsState().value.toString()
-//    val motivation = sampleMotivations
+
     val firebaseAuth = FirebaseAuth.getInstance()
-//    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
+
 
     val colorScheme = MaterialTheme.colorScheme
+    val alertDialogState = remember { mutableStateOf(false) }
+
 
     // 🔥 Responsive Setup
     val config = LocalConfiguration.current
@@ -98,7 +104,7 @@ fun TeamHeadScreen(
     LaunchedEffect(Unit) {
         fetchingViewModel.listenMotivations(currentUserEmail)
     }
-
+    var selectedMotivation by remember { mutableStateOf<Motivation?>(null) }
 
     val fetchedMotivation = fetchingViewModel.motivations.value
 
@@ -125,7 +131,7 @@ fun TeamHeadScreen(
                 contentPadding = PaddingValues(bottom = 48.dp),
             ) {
 
-                // ── Header
+
                 item {
                     HeroHeader(
                         userName = userName,
@@ -197,24 +203,52 @@ fun TeamHeadScreen(
                             }
                         }
                     }
+
+
                 }
-
                 // TODO ADD Firebase stuff
-                items(fetchedMotivation){ motivation ->
+                items(
+                    items = fetchedMotivation,
+                    key = { it.id }
+                ) { motivation ->
                     Spacer(Modifier.padding(12.dp))
-
+                    // TODO SWIPE TO DELETE CARD
                     SwipeToDeleteWrapper(
                         onDelete = {
-
+                            selectedMotivation = motivation
+                            alertDialogState.value = true
                         }
                     ) {
 
                         MotivationCard(motivation)
+
                     }
+
+
                 }
 
-            }
 
+            }
+            selectedMotivation?.let { items ->
+
+                DeleteConfirmationDialog(
+                    isVisible = true,
+                    onDismiss = { selectedMotivation = null },
+                    onConfirm = {
+
+                        fetchingViewModel.deleteMotivation(
+                            currentUserEmail,
+                            docId = items.id,
+                            onSuccess = {
+                                selectedMotivation = null
+                            },
+                            onFailure = {
+                                Log.d("DeleteMotivation", it)
+                            }
+                        )
+                    }
+                )
+            }
         }
     }
 }

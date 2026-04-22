@@ -93,7 +93,25 @@ class UploadFetchMotivationQuotes : ViewModel() {
             }
     }
 
-    fun resetState() {
-        addState = AddMotivationState.Idle
+    fun deleteMotivation(
+        email: String,
+        docId: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (String) -> Unit = {}
+    ) {
+
+        db.collection("roles")
+            .document(email.trim())
+            .collection("motivations")
+            .document(docId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("DELETE_SUCCESS", "Deleted: $docId")
+                onSuccess()
+            }
+            .addOnFailureListener {
+                Log.e("DELETE_ERROR", it.message.toString())
+                onFailure(it.message ?: "Delete failed")
+            }
     }
 }
