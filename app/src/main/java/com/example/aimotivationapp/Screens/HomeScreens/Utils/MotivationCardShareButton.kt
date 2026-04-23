@@ -111,6 +111,7 @@ fun MotivationCard(motivation: Motivation) {
 //        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
 //        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
 //    ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +151,7 @@ fun MotivationCard(motivation: Motivation) {
 
             Column(modifier = Modifier.padding(18.dp)) {
 
-                // Tone badge + time
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

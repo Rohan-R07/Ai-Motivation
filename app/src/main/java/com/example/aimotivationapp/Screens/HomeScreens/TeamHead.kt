@@ -85,8 +85,6 @@ fun TeamHeadScreen(
     val fetchingViewModel: UploadFetchMotivationQuotes = viewModel()
     val userName = viewModel.userName.collectAsState().value.toString()
 
-    val firebaseAuth = FirebaseAuth.getInstance()
-
 
     val colorScheme = MaterialTheme.colorScheme
     val alertDialogState = remember { mutableStateOf(false) }
