@@ -18,7 +18,7 @@ class FirestoreViewModel : ViewModel() {
 
         FirebaseFirestore.getInstance()
             .collection("roles")
-            .document(email.trim()) // important
+            .document(email.trim())
 //            .document()
             .get()
             .addOnSuccessListener { doc ->
@@ -32,8 +32,6 @@ class FirestoreViewModel : ViewModel() {
                     onSuccess()
                 } else {
                     onFailure()
-                    Log.d("Monitor viewModel", email)
-
                 }
 
             }
@@ -42,10 +40,13 @@ class FirestoreViewModel : ViewModel() {
                 Log.d("TeamHeadLoginScree", it.toString())
             }
 
-        // ✅ NEW FUNCTION: Get all roles data
+
+
+
 
     }
 
+    // used in faculty screen
     fun getAllRolesData(
         onSuccess: (List<Map<String, Any>>) -> Unit,
         onFailure: (Exception) -> Unit
@@ -74,5 +75,6 @@ class FirestoreViewModel : ViewModel() {
                 onFailure(exception)
             }
     }
+
 
 }

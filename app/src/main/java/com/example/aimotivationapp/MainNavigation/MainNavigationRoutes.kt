@@ -26,7 +26,7 @@ data object TeamHeadLoginScreen
 data object CreateMotivation
 
 @Serializable
-data object GeneratedMotivationScreen
+data object SettingsScreen
 
 
 //}

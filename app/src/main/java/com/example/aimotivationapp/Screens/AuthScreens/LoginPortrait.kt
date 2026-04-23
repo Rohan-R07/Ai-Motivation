@@ -713,7 +713,7 @@ fun LoginPotrait(
                                 onValueChange = {
                                     signInHeadId = it; signInHeadIdError = null
                                 },
-                                placeholder = "e.g. HD-00123",
+                                placeholder = "e.g. head@gmail.com",
                                 icon = Icons.Rounded.Badge,
                                 error = signInHeadIdError,
                                 cornerRadius = fieldCornerRadius,

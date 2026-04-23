@@ -14,7 +14,7 @@ class PreferenceSavingViewModel(
     private val repo: UserRepository
 ) : ViewModel() {
 
-    // 🔥 Name Flow
+
     val userName: StateFlow<String?> = repo.getUserName()
         .stateIn(
             viewModelScope,
@@ -22,7 +22,7 @@ class PreferenceSavingViewModel(
             null
         )
 
-    // 🔥 Email Flow
+
     val userEmail: StateFlow<String?> = repo.getUserEmail()
         .stateIn(
             viewModelScope,
@@ -30,14 +30,14 @@ class PreferenceSavingViewModel(
             "null"
         )
 
-    // 🔹 Save name
+
     fun saveName(name: String) {
         viewModelScope.launch {
             repo.saveAndUpdateName(name)
         }
     }
 
-    // 🔹 Save email
+
     fun saveEmail(email: String) {
         viewModelScope.launch {
             repo.saveAndUpdateEmail(email)

@@ -1,6 +1,5 @@
 package com.example.aimotivationapp.Screens.HomeScreens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,65 +13,42 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.FacultyScreen
 import com.example.aimotivationapp.MainNavigation.LoginScreen
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
-import androidx.compose.material.icons.rounded.AutoAwesome
-import androidx.compose.material.icons.rounded.Bookmark
-import androidx.compose.material.icons.rounded.BookmarkBorder
-import androidx.compose.material.icons.rounded.Category
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.EmojiEvents
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Notes
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.SentimentDissatisfied
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.TrendingUp
-import androidx.compose.material.icons.rounded.Verified
-import androidx.compose.material.icons.rounded.WorkspacePremium
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -85,7 +61,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -95,7 +70,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -105,24 +79,23 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.ToneColor
+import com.example.aimotivationapp.UploadBackend.Motivation
+import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.cos
@@ -145,17 +118,17 @@ private fun hClass(h: Dp) = when {
 }
 
 // ─── Tone / Category Helpers ─────────────────────────────────────
-private fun toneIcon(tone: String): ImageVector = when (tone) {
-    "All" -> Icons.Rounded.Category
-    "Success" -> Icons.Rounded.EmojiEvents
-    "Growth" -> Icons.Rounded.TrendingUp
-    "Leadership" -> Icons.Rounded.Star
-    "Perseverance" -> Icons.Rounded.LocalFireDepartment
-    "Creativity" -> Icons.Rounded.AutoAwesome
-    "Wisdom" -> Icons.Rounded.Psychology
-    "Focus" -> Icons.Rounded.School
-    else -> Icons.Rounded.Notes
-}
+//private fun toneIcon(tone: String): ImageVector = when (tone) {
+//    "All" -> Icons.Rounded.Category
+//    "Success" -> Icons.Rounded.EmojiEvents
+//    "Growth" -> Icons.Rounded.TrendingUp
+//    "Leadership" -> Icons.Rounded.Star
+//    "Perseverance" -> Icons.Rounded.LocalFireDepartment
+//    "Creativity" -> Icons.Rounded.AutoAwesome
+//    "Wisdom" -> Icons.Rounded.Psychology
+//    "Focus" -> Icons.Rounded.School
+//    else -> Icons.Rounded.Notes
+//}
 
 private fun toneColor(tone: String): Color = when (tone) {
     "Success" -> Color(0xFFFFB300)
@@ -247,6 +220,13 @@ fun FacultyScreen(
 
     val firebaseAuth = FirebaseAuth.getInstance()
 
+    val fetchMotivationQuotesVM: UploadFetchMotivationQuotes = viewModel()
+
+    val headEmail = viewModel.userEmail.collectAsState().value.toString()
+
+    fetchMotivationQuotesVM.listenMotivations(headEmail)
+
+    val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
 
 
     val cs = MaterialTheme.colorScheme
@@ -255,7 +235,7 @@ fun FacultyScreen(
     val sh = cfg.screenHeightDp.dp
     val wc = wClass(sw)
     val hc = hClass(sh)
-    val clipboard = LocalClipboardManager.current
+
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
@@ -304,13 +284,11 @@ fun FacultyScreen(
     var selTone by remember { mutableStateOf("All") }
     var showFilters by remember { mutableStateOf(true) }
 
-    val quotes = remember { mutableStateListOf<RecentMotivation>() }
-    val favorites = remember { mutableStateListOf<Int>() }
-    val bookmarks = remember { mutableStateListOf<Int>() }
+    val quotes = remember { mutableStateListOf<Motivation>() }
 
     val tones = listOf(
-        "All", "Success", "Growth", "Leadership",
-        "Perseverance", "Creativity", "Wisdom", "Focus"
+        "All", "Friendly", "Encouraging", "Positive",
+        "Uplifting", "Motivational"
     )
 
     val filtered by remember(quotes, selTone) {
@@ -319,82 +297,19 @@ fun FacultyScreen(
             else quotes.filter { it.tone == selTone }
         }
     }
+    var selectedMotivation by remember { mutableStateOf<Motivation?>(null) }
 
-    // ── Load ─────────────────────────────────────────────────────
+
+    // ── Load
     fun loadQuotes(initial: Boolean = false) {
         scope.launch {
             if (initial) isLoading = true else isRefreshing = true
             delay(900)
-
-            // ── Replace with your Firestore fetch ─────────────────
-            val sample = listOf(
-                RecentMotivation(
-                    id = 1,
-                    tone = "Success",
-                    toneColor = ToneColor.Friendly.toString(),
-                    message = "The secret of getting ahead is getting started.",
-                    emoji = "🏆"
-                ),
-                RecentMotivation(
-                    id = 2,
-                    tone = "Perseverance",
-                    toneColor = ToneColor.Encouraging.toString(),
-                    message = "Believe you can and you're halfway there.",
-
-                    emoji = "🔥"
-                ),
-                RecentMotivation(
-                    id = 3,
-                    tone = "Growth",
-                    toneColor = ToneColor.Inspiring.toString(),
-                    message = "Push yourself, because no one else is going to do it for you.",
-
-
-                    emoji = "🌱"
-                ),
-                RecentMotivation(
-                    id = 4,
-                    tone = "Creativity",
-                    toneColor = ToneColor.Bold.toString(),
-                    message = "Your limitation — it's only your imagination.",
-
-                    emoji = "✨"
-                ),
-                RecentMotivation(
-                    id = 5,
-                    tone = "Leadership",
-                    toneColor = ToneColor.Friendly.toString(),
-                    message = "Wake up with determination. Go to bed with satisfaction.",
-
-                    emoji = "⭐"
-                ),
-                RecentMotivation(
-                    id = 6,
-                    tone = "Wisdom",
-                    toneColor = ToneColor.Encouraging.toString(),
-                    message = "Do something today that your future self will thank you for.",
-                    emoji = "🦉"
-                ),
-                RecentMotivation(
-                    id = 7,
-                    tone = "Focus",
-                    toneColor = ToneColor.Inspiring.toString(),
-                    message = "The harder you work for something, the greater you'll feel.",
-
-                    emoji = "🎯"
-                ),
-                RecentMotivation(
-                    id = 8,
-                    tone = "Success",
-                    toneColor = ToneColor.Encouraging.toString(),
-                    message = "Great things never come from comfort zones.",
-                    emoji = "🚀"
-                ),
-            )
-            // ─────────────────────────────────────────────────────
+            val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
+            val sortedList = fetchedMotivationQuotes.toList().sortedBy { it.tone }
 
             quotes.clear()
-            quotes.addAll(sample)
+            quotes.addAll(sortedList)
             isLoading = false
             isRefreshing = false
         }
@@ -437,15 +352,13 @@ fun FacultyScreen(
                 // ── Hero Header ───────────────────────────────────
                 item {
                     FacultyHeader(
-                        userName =userName ,
+                        userName = userName,
                         headerH = headerH,
                         avatarSz = avatarSz,
                         cardRadius = cardRadius,
-                        totalQuotes = quotes.size,
-                        favCnt = favorites.size,
-                        bookmarkCnt = bookmarks.size,
-                        iconSz = iconSz,
-                        onLogout = {
+                        totalQuotes = fetchedMotivationQuotes.size,
+                        onSettings = {
+
                             firebaseAuth.signOut()
                             viewModel.clearData()
                             mainBackStack.add(LoginScreen)
@@ -473,7 +386,7 @@ fun FacultyScreen(
                                 )
                             )
                             Text(
-                                text = "${filtered.size} quotes",
+                                text = "${fetchedMotivationQuotes.size} quotes",
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = cs.onSurface.copy(alpha = 0.5f)
                                 )
@@ -523,11 +436,7 @@ fun FacultyScreen(
                                     },
                                     leadingIcon = if (selTone == tone) {
                                         {
-                                            Icon(
-                                                imageVector = toneIcon(tone),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(15.dp)
-                                            )
+
                                         }
                                     } else null,
                                     colors = FilterChipDefaults.filterChipColors(
@@ -540,6 +449,8 @@ fun FacultyScreen(
                         }
                     }
                 }
+
+
 
                 item { Spacer(Modifier.height(gap)) }
 
@@ -572,6 +483,11 @@ fun FacultyScreen(
                     }
                 }
 
+                val filteredQuotes = if (selTone == "All") {
+                    fetchedMotivationQuotes
+                } else {
+                    fetchedMotivationQuotes.filter { it.tone == selTone}
+                }
                 // ── Empty ─────────────────────────────────────────
                 if (!isLoading && filtered.isEmpty()) {
                     item {
@@ -585,42 +501,18 @@ fun FacultyScreen(
 
                 // ── Quote Cards ───────────────────────────────────
                 if (!isLoading && filtered.isNotEmpty()) {
-                    itemsIndexed(
-                        items = filtered,
-                        key = { _, q -> q.id }
-                    ) { idx, quote ->
+                    items(
+                        items = filteredQuotes,
 
-                        QuoteCard(
-                            quote = quote,
-                            index = idx,
-                            isFav = favorites.contains(quote.id),
-                            isBookmarked = bookmarks.contains(quote.id),
-                            onFav = {
-                                if (favorites.contains(quote.id)) favorites.remove(quote.id)
-                                else favorites.add(quote.id)
-                            },
-                            onBookmark = {
-                                if (bookmarks.contains(quote.id)) bookmarks.remove(quote.id)
-                                else bookmarks.add(quote.id)
-                            },
-                            onCopy = {
-
-                                scope.launch {
-                                    snackbar.showSnackbar(
-                                        "Quote copied to clipboard",
-                                        withDismissAction = true,
-                                        duration = SnackbarDuration.Short
-                                    )
-                                }
-                            },
-                            hPad = hPad,
-                            cardRadius = cardRadius,
-                            qFontSize = qFontSize,
-                            iconSz = iconSz
+                    ) { quote ->
+                        Spacer(Modifier.padding(4.dp))
+                        MotivationCard(
+                            motivation = quote
                         )
 
-                        if (idx < filtered.lastIndex)
-                            Spacer(Modifier.height(12.dp))
+                        selectedMotivation = quote
+
+
                     }
                 }
             }
@@ -628,10 +520,7 @@ fun FacultyScreen(
     }
 }
 
-
-// ═══════════════════════════════════════════════════════════════════
-// ═══  FACULTY HEADER  ═════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
+// FACULTY HEADER
 @Composable
 private fun FacultyHeader(
     userName: String,
@@ -639,10 +528,7 @@ private fun FacultyHeader(
     avatarSz: Dp,
     cardRadius: Dp,
     totalQuotes: Int,
-    favCnt: Int,
-    bookmarkCnt: Int,
-    iconSz: Dp,
-    onLogout: () -> Unit
+    onSettings: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val inf = rememberInfiniteTransition(label = "hdrAnim")
@@ -763,11 +649,13 @@ private fun FacultyHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Icon(
-                    Icons.Rounded.LocalFireDepartment,
-                    contentDescription = null,
-                    tint = opc,
-                    modifier = Modifier.size(22.dp)
+                Text(
+                    text = "M",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                    color = opc,
+                    modifier = Modifier.size(22.dp),
+                    textAlign = TextAlign.Center
                 )
                 Text(
                     "Motivato",
@@ -778,16 +666,16 @@ private fun FacultyHeader(
                     )
                 )
             }
-
+            // TODO Have to do settings screen
             IconButton(
-                onClick = onLogout,
+                onClick = onSettings,
                 modifier = Modifier
                     .size(38.dp)
                     .background(opc.copy(alpha = 0.15f), CircleShape)
             ) {
                 Icon(
-                    Icons.AutoMirrored.Rounded.Logout,
-                    contentDescription = "Logout",
+                    Icons.Default.Settings,
+                    contentDescription = "Settings",
                     tint = opc,
                     modifier = Modifier.size(20.dp)
                 )
@@ -828,12 +716,7 @@ private fun FacultyHeader(
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        "Good day,",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = opc.copy(alpha = 0.75f)
-                        )
-                    )
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -845,12 +728,7 @@ private fun FacultyHeader(
                                 color = opc
                             )
                         )
-                        Icon(
-                            Icons.Rounded.Verified,
-                            contentDescription = null,
-                            tint = opc.copy(alpha = 0.85f),
-                            modifier = Modifier.size(18.dp)
-                        )
+
                     }
                     Text(
                         "Faculty Member",
@@ -870,18 +748,7 @@ private fun FacultyHeader(
                     label = "Quotes",
                     tint = opc
                 )
-                StatPill(
-                    icon = Icons.Rounded.Favorite,
-                    value = "$favCnt",
-                    label = "Liked",
-                    tint = opc
-                )
-                StatPill(
-                    icon = Icons.Rounded.Bookmark,
-                    value = "$bookmarkCnt",
-                    label = "Saved",
-                    tint = opc
-                )
+
             }
         }
     }
@@ -915,288 +782,6 @@ private fun StatPill(
                     fontWeight = FontWeight.SemiBold
                 )
             )
-        }
-    }
-}
-
-
-// ═══════════════════════════════════════════════════════════════════
-// ═══  QUOTE CARD  ═════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-@Composable
-private fun QuoteCard(
-    quote: RecentMotivation,
-    index: Int,
-    isFav: Boolean,
-    isBookmarked: Boolean,
-    onFav: () -> Unit,
-    onBookmark: () -> Unit,
-    onCopy: () -> Unit,
-    hPad: Dp,
-    cardRadius: Dp,
-    qFontSize: androidx.compose.ui.unit.TextUnit,
-    iconSz: Dp
-) {
-    val cs = MaterialTheme.colorScheme
-
-    // Staggered entrance animation
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { delay(index * 70L); visible = true }
-
-    val cardScale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0.88f,
-        animationSpec = spring(dampingRatio = 0.65f, stiffness = 280f),
-        label = "cardScale"
-    )
-    val cardAlpha by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(350),
-        label = "cardAlpha"
-    )
-    val favScale by animateFloatAsState(
-        targetValue = if (isFav) 1.28f else 1f,
-        animationSpec = spring(dampingRatio = 0.38f, stiffness = 500f),
-        label = "favScale"
-    )
-
-    // Derive color from the tone string
-    val catColor = toneColor(quote.tone)
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = hPad)
-            .scale(cardScale)
-            .alpha(cardAlpha),
-        shape = RoundedCornerShape(cardRadius),
-        colors = CardDefaults.cardColors(containerColor = cs.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(0.6.dp, catColor.copy(alpha = 0.18f))
-    ) {
-        Column(Modifier.fillMaxWidth()) {
-
-            // ── Category colour bar at top ───────────────────────
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(4.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(catColor, catColor.copy(0.35f))
-                        )
-                    )
-            )
-
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            ) {
-
-                // ── Header row: emoji + tone tag + team ──────────
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Emoji badge
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(catColor.copy(0.12f), CircleShape)
-                        ) {
-                            Text(
-                                quote.emoji,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                        }
-
-                        // Tone chip
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = catColor.copy(alpha = 0.10f)
-                        ) {
-                            Row(
-                                Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    toneIcon(quote.tone),
-                                    null,
-                                    tint = catColor,
-                                    modifier = Modifier.size(12.dp)
-                                )
-                                Text(
-                                    quote.tone,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = catColor,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    // Team badge
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = cs.primaryContainer
-                    ) {
-                        Row(
-                            Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                Icons.Rounded.WorkspacePremium,
-                                null,
-                                tint = cs.onPrimaryContainer,
-                                modifier = Modifier.size(12.dp)
-                            )
-//                            Text(
-//                                quote.team,
-//                                style = MaterialTheme.typography.labelSmall.copy(
-//                                    color = cs.onPrimaryContainer,
-//                                    fontWeight = FontWeight.Bold
-//                                )
-//                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                // ── Canvas-drawn opening quote mark ──────────────
-                QuoteMark(
-                    size = 38.dp,
-                    color = catColor.copy(alpha = 0.20f),
-                    flipped = true          // flipped = opening "
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                // ── Message text ─────────────────────────────────
-                Text(
-                    quote.message,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = qFontSize,
-                        lineHeight = qFontSize * 1.65f,
-                        fontStyle = FontStyle.Italic,
-                        color = cs.onSurface.copy(alpha = 0.9f)
-                    )
-                )
-
-                Spacer(Modifier.height(14.dp))
-
-                // ── Sent-by line ─────────────────────────────────
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Box(
-                        Modifier
-                            .width(28.dp)
-                            .height(2.dp)
-                            .background(catColor.copy(0.55f), RoundedCornerShape(1.dp))
-                    )
-
-                }
-
-                Spacer(Modifier.height(18.dp))
-
-                // ── Divider ───────────────────────────────────────
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(cs.outline.copy(alpha = 0.08f))
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                // ── Footer: time + actions ────────────────────────
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Time ago pill
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(26.dp)
-                                .background(cs.surfaceVariant, CircleShape)
-                        ) {
-                            Icon(
-                                Icons.Rounded.Person,
-                                null,
-                                tint = cs.onSurfaceVariant,
-                                modifier = Modifier.size(14.dp)
-                            )
-                        }
-
-                    }
-
-                    // Action buttons
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-
-                        // Favourite
-                        IconButton(
-                            onClick = onFav,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                if (isFav) Icons.Rounded.Favorite
-                                else Icons.Rounded.FavoriteBorder,
-                                "Like",
-                                tint = if (isFav) Color(0xFFE91E63)
-                                else cs.onSurface.copy(alpha = 0.45f),
-                                modifier = Modifier
-                                    .size(iconSz * 0.9f)
-                                    .scale(favScale)
-                            )
-                        }
-
-                        // Bookmark
-                        IconButton(
-                            onClick = onBookmark,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                if (isBookmarked) Icons.Rounded.Bookmark
-                                else Icons.Rounded.BookmarkBorder,
-                                "Bookmark",
-                                tint = if (isBookmarked) cs.primary
-                                else cs.onSurface.copy(alpha = 0.45f),
-                                modifier = Modifier.size(iconSz * 0.9f)
-                            )
-                        }
-
-                        // Copy
-                        IconButton(
-                            onClick = onCopy,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                Icons.Rounded.ContentCopy,
-                                "Copy",
-                                tint = cs.onSurface.copy(alpha = 0.45f),
-                                modifier = Modifier.size(iconSz * 0.85f)
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }

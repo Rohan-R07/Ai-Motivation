@@ -1,5 +1,6 @@
 package com.example.aimotivationapp.Screens.GenerateMotivation
 
+import android.app.Activity
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -39,7 +40,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -49,6 +53,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
 import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
@@ -79,8 +84,6 @@ fun CreateMotivationScreen(
     mainBackStack: SnapshotStateList<Any>
 ) {
 
-    val context = LocalContext.current
-
 
     val firebaseAuth = FirebaseAuth.getInstance()
     val currentEmail = firebaseAuth.currentUser?.email.toString()
@@ -99,16 +102,14 @@ fun CreateMotivationScreen(
     val isRegenerating = aiViewModel.isRegenerating
     val errorMessage = aiViewModel.errorMessage
 
-    val uploadFetchViewModel : UploadFetchMotivationQuotes = viewModel()
+    val uploadFetchViewModel: UploadFetchMotivationQuotes = viewModel()
 
 
-    // This prevents crash during exit animation when reset() clears the list
     var stableMotivations by remember { mutableStateOf<List<RecentMotivation>>(emptyList()) }
 
-    // ── Only update stableMotivations when list is NOT empty ─────────────────
     LaunchedEffect(parsedMotivations) {
         if (parsedMotivations.isNotEmpty()) {
-            stableMotivations = parsedMotivations  // ✅ Never goes empty mid-animation
+            stableMotivations = parsedMotivations
             viewState = MotivationViewState.GENERATED
         }
     }
@@ -116,19 +117,24 @@ fun CreateMotivationScreen(
     val view = LocalView.current
     val isGenerated = viewState == MotivationViewState.GENERATED
 
-    SideEffect {
-        val window = (view.context as? android.app.Activity)?.window ?: return@SideEffect
+    DisposableEffect(isGenerated) {
+        val window = (view.context as? Activity)?.window
+        val controller = window?.let { WindowInsetsControllerCompat(it, view) }
+
         if (isGenerated) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowInsetsControllerCompat(window, view).apply {
-                hide(WindowInsetsCompat.Type.statusBars())
-                systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
+            WindowCompat.setDecorFitsSystemWindows(window!!, false)
+            controller?.hide(WindowInsetsCompat.Type.statusBars())
+            controller?.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
-            WindowCompat.setDecorFitsSystemWindows(window, true)
-            WindowInsetsControllerCompat(window, view)
-                .show(WindowInsetsCompat.Type.statusBars())
+            WindowCompat.setDecorFitsSystemWindows(window!!, true)
+            controller?.show(WindowInsetsCompat.Type.statusBars())
+        }
+
+        onDispose {
+
+            WindowCompat.setDecorFitsSystemWindows(window!!, true)
+            controller?.show(WindowInsetsCompat.Type.statusBars())
         }
     }
 
@@ -214,8 +220,8 @@ fun CreateMotivationScreen(
                             onSendToTeam = { motivation ->
                                 // TODO FIREBASE FIRESTORE UPLOADING IS DONE RIGHT HERE
 
-                                Log.d("CreateMotivationScreen",motivation.message)
-                                Log.d("CreateMotivationScreen",motivation.tone)
+                                Log.d("CreateMotivationScreen", motivation.message)
+                                Log.d("CreateMotivationScreen", motivation.tone)
 
 
                                 uploadFetchViewModel.addMotivation(
@@ -244,7 +250,7 @@ fun CreateMotivationScreen(
     }
 }
 
-// ─── Create Form Content ──────────────────────────────────────────────────────
+// ─ Create Form Content -------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -366,7 +372,6 @@ fun GeneraterMotivationSCreen(
     onSendToTeam: (RecentMotivation) -> Unit = {},
     onRegenerate: () -> Unit = {}
 ) {
-
     if (motivations.isEmpty()) return
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -374,28 +379,19 @@ fun GeneraterMotivationSCreen(
     var dragOffset by remember { mutableFloatStateOf(0f) }
     val swipeThreshold = 80f
 
-    // ── Reset index when new motivations arrive after regenerate ──────────────
-    LaunchedEffect(motivations) {
-        currentIndex = 0
-    }
+    LaunchedEffect(motivations) { currentIndex = 0 }
 
     val currentMotivation = motivations[currentIndex]
     val gradientColors = gradientForTone(currentMotivation.toneColor)
 
     val animColor1 by animateColorAsState(
-        gradientColors[0],
-        tween(700, easing = EaseInOutCubic),
-        label = "c1"
+        gradientColors[0], tween(700, easing = EaseInOutCubic), label = "c1"
     )
     val animColor2 by animateColorAsState(
-        gradientColors[1],
-        tween(700, easing = EaseInOutCubic),
-        label = "c2"
+        gradientColors[1], tween(700, easing = EaseInOutCubic), label = "c2"
     )
     val animColor3 by animateColorAsState(
-        gradientColors[2],
-        tween(700, easing = EaseInOutCubic),
-        label = "c3"
+        gradientColors[2], tween(700, easing = EaseInOutCubic), label = "c3"
     )
 
     val animatedDragOffset by animateFloatAsState(
@@ -407,14 +403,38 @@ fun GeneraterMotivationSCreen(
     fun goNext() {
         if (currentIndex < motivations.lastIndex) {
             isForward = true; currentIndex++
-        }; dragOffset = 0f
+        }
+        dragOffset = 0f
     }
 
     fun goPrev() {
         if (currentIndex > 0) {
             isForward = false; currentIndex--
-        }; dragOffset = 0f
+        }
+        dragOffset = 0f
     }
+
+    val enterAnim = if (isForward)
+        slideInHorizontally(
+            initialOffsetX = { it },
+            animationSpec = tween(500, easing = EaseOutQuart)
+        ) + fadeIn(tween(400))
+    else
+        slideInHorizontally(
+            initialOffsetX = { -it },
+            animationSpec = tween(500, easing = EaseOutQuart)
+        ) + fadeIn(tween(400))
+
+    val exitAnim = if (isForward)
+        slideOutHorizontally(
+            targetOffsetX = { -it },
+            animationSpec = tween(400, easing = EaseInQuart)
+        ) + fadeOut(tween(300))
+    else
+        slideOutHorizontally(
+            targetOffsetX = { it },
+            animationSpec = tween(400, easing = EaseInQuart)
+        ) + fadeOut(tween(300))
 
     Box(
         modifier = Modifier
@@ -441,15 +461,20 @@ fun GeneraterMotivationSCreen(
                 )
             }
     ) {
+
+        // ── Decorative background circles ─────────────────────
         QuoteDecorativeCircles(animColor1, animColor3)
 
+        // ── Swipe hint arrows overlay ──────────────────────────
         SwipeHintOverlay(
             dragOffset = animatedDragOffset,
             canGoNext = currentIndex < motivations.lastIndex,
             canGoPrev = currentIndex > 0
         )
 
-        // ── Back button ───────────────────────────────────────────────────────
+        // ── Back button ────────────────────────────────────────
+        // ✅ Placed directly in Box so it's always at top-left
+        // ✅ zIndex ensures it's above everything including gesture layer
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -457,74 +482,62 @@ fun GeneraterMotivationSCreen(
                 .statusBarsPadding()
                 .padding(start = 16.dp, top = 12.dp)
                 .size(44.dp)
+                .zIndex(10f)                         // ✅ Always on top
                 .shadow(12.dp, CircleShape)
                 .background(Color.White.copy(alpha = 0.18f), CircleShape)
         ) {
             Icon(
-                Icons.Default.ArrowBack,
-                "Back",
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
                 tint = Color.White,
                 modifier = Modifier.size(22.dp)
             )
         }
 
-        // ── Slide quote cards ─────────────────────────────────────────────────
-        val enterAnim = if (isForward)
-            slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(500, easing = EaseOutQuart)
-            ) + fadeIn(tween(400))
-        else
-            slideInHorizontally(
-                initialOffsetX = { -it },
-                animationSpec = tween(500, easing = EaseOutQuart)
-            ) + fadeIn(tween(400))
-
-        val exitAnim = if (isForward)
-            slideOutHorizontally(
-                targetOffsetX = { -it },
-                animationSpec = tween(400, easing = EaseInQuart)
-            ) + fadeOut(tween(300))
-        else
-            slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(400, easing = EaseInQuart)
-            ) + fadeOut(tween(300))
-
-        // ── Quote card OR shimmer ─────────────────────────────────────────────
+        // ── Center: Quote card with INTERNAL scroll only ───────
+        // ✅ wrapContentHeight so short text cards don't stretch
+        // ✅ weight not used — Box center alignment handles position
         AnimatedContent(
             targetState = currentIndex,
             transitionSpec = { enterAnim togetherWith exitAnim },
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(horizontal = 28.dp)
-                .offset(y = (-20).dp),
+                .statusBarsPadding()
+                .padding(
+                    top = 72.dp,        // clears back button
+                    start = 24.dp,
+                    end = 24.dp,
+                    bottom = 160.dp     // clears bottom action bar
+                )
+                .fillMaxWidth(),
             label = "quote"
         ) { idx ->
-            // ✅ Show shimmer placeholder instead of quote while regenerating
             if (isRegenerating) {
                 ShimmerQuotePlaceholder()
             } else {
-                QuoteCard(motivations[idx])
+                // ✅ QuoteCard handles its own internal scroll
+                ScrollableQuoteCard(motivation = motivations[idx])
             }
         }
 
-        // ── Bottom area ───────────────────────────────────────────────────────
+        // ── Bottom fixed area ──────────────────────────────────
+        // ✅ Always visible, never scrolls away
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(start = 24.dp, end = 24.dp, bottom = 36.dp),
+                .padding(start = 24.dp, end = 24.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Swipe hint text
             AnimatedVisibility(
                 visible = dragOffset == 0f && !isRegenerating,
                 enter = fadeIn(tween(300)),
                 exit = fadeOut(tween(200))
             ) {
                 Text(
-                    "swipe to explore",
+                    text = "swipe to explore",
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.50f),
                     fontWeight = FontWeight.Medium,
@@ -532,13 +545,17 @@ fun GeneraterMotivationSCreen(
                 )
             }
 
-            // ✅ Show shimmer dots while regenerating
+            // Dot indicators
             if (isRegenerating) {
                 ShimmerDotIndicators()
             } else {
-                QuoteDotIndicators(total = motivations.size, currentIndex = currentIndex)
+                QuoteDotIndicators(
+                    total = motivations.size,
+                    currentIndex = currentIndex
+                )
             }
 
+            // Action buttons row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -554,6 +571,151 @@ fun GeneraterMotivationSCreen(
     }
 }
 
+
+
+@Composable
+fun ScrollableQuoteCard(motivation: RecentMotivation) {
+    val cardScrollState = rememberScrollState()
+
+    // Fade edge indicators so user knows content is scrollable
+    val showTopFade by remember {
+        derivedStateOf { cardScrollState.value > 0 }
+    }
+    val showBottomFade by remember {
+        derivedStateOf {
+            cardScrollState.value < cardScrollState.maxValue
+                    && cardScrollState.maxValue > 0
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            // ✅ Key: not fillMaxHeight — card only grows as tall as it needs
+            // but is capped by the parent padding constraints
+            .wrapContentHeight()
+    ) {
+        // ── The actual card ────────────────────────────────────
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            color = Color.White.copy(alpha = 0.15f),
+            tonalElevation = 0.dp
+        ) {
+            // ✅ This column scrolls — NOT the screen
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(cardScrollState)     // ✅ only card scrolls
+                    .padding(28.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Quote icon
+                Text(
+                    text = "\u201C",
+                    fontSize = 56.sp,
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 40.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp),
+                    textAlign = TextAlign.Start
+                )
+
+                // ✅ Quote text — no fixed height, grows naturally
+                Text(
+                    text = motivation.message,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 28.sp,
+                    textAlign = TextAlign.Center
+                )
+
+                // Closing quote icon
+                Text(
+                    text = "\u201D",
+                    fontSize = 56.sp,
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 40.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    textAlign = TextAlign.End
+                )
+
+                HorizontalDivider(
+                    color = Color.White.copy(alpha = 0.3f),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
+                // Tone badge
+                Surface(
+                    shape = RoundedCornerShape(50.dp),
+                    color = Color.White.copy(alpha = 0.20f)
+                ) {
+                    Text(
+                        text = motivation.toneColor.replaceFirstChar { it.uppercase() },
+                        fontSize = 13.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
+                }
+            }
+        }
+
+        // ── ✅ Top fade edge — visible only when scrolled down ─
+        AnimatedVisibility(
+            visible = showTopFade,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(200)),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Black.copy(alpha = 0.25f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+        }
+
+        // ── ✅ Bottom fade edge — hints more content below ─────
+        AnimatedVisibility(
+            visible = showBottomFade,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(200)),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.25f)
+                            )
+                        )
+                    )
+            )
+        }
+    }
+}
 // ─── Form Sub-Composables ─────────────────────────────────────────────────────
 
 @Composable

@@ -1,6 +1,7 @@
 package com.example.aimotivationapp.Screens.HomeScreens.Utils
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,48 +44,55 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.aimotivationapp.Screens.HomeScreens.MotivationTone
+import com.example.aimotivationapp.UploadBackend.Motivation
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
-fun MotivationCard(motivation: RecentMotivation) {
+fun MotivationCard(motivation: Motivation) {
     val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     // TONE COLOUR Section
+    val accentContainer = when (motivation.tone) {
 
-    val accentContainer = when (motivation.toneColor) {
         ToneColor.Friendly.toString() -> colorScheme.tertiaryContainer
         ToneColor.Encouraging.toString() -> colorScheme.secondaryContainer
-        ToneColor.Inspiring.toString() -> colorScheme.primaryContainer
-        ToneColor.Bold.toString() -> colorScheme.errorContainer
-        else -> {
-            colorScheme.surfaceVariant
-        }
+        ToneColor.Uplifting.toString() -> colorScheme.primaryContainer
+        ToneColor.Positive.toString() -> colorScheme.errorContainer
+        ToneColor.Motivational.toString() -> colorScheme.surfaceVariant
+
+        else -> colorScheme.surfaceVariant
     }
-    val accentContent = when (motivation.toneColor) {
+
+    val accentContent = when (motivation.tone) {
+
         ToneColor.Friendly.toString() -> colorScheme.onTertiaryContainer
         ToneColor.Encouraging.toString() -> colorScheme.onSecondaryContainer
-        ToneColor.Inspiring.toString() -> colorScheme.onPrimaryContainer
-        ToneColor.Bold.toString() -> colorScheme.onErrorContainer
+        ToneColor.Uplifting.toString() -> colorScheme.onPrimaryContainer
+        ToneColor.Positive.toString() -> colorScheme.onErrorContainer
+        ToneColor.Motivational.toString() -> colorScheme.onSurfaceVariant
+
+        else -> colorScheme.onSurfaceVariant
+    }
+    val accentPrimary = when (motivation.tone) {
+        ToneColor.Friendly.toString() -> colorScheme.tertiaryContainer
+        ToneColor.Encouraging.toString() -> colorScheme.secondaryContainer
+        ToneColor.Uplifting.toString() -> colorScheme.primaryContainer
+        ToneColor.Positive.toString() -> colorScheme.errorContainer
+        ToneColor.Motivational.toString() -> colorScheme.onTertiaryContainer
         else -> {
             colorScheme.surfaceVariant
 
         }
     }
-    val accentPrimary = when (motivation.toneColor) {
-        ToneColor.Friendly.toString() -> colorScheme.tertiary
-        ToneColor.Encouraging.toString() -> colorScheme.secondary
-        ToneColor.Inspiring.toString() -> colorScheme.primary
-        ToneColor.Bold.toString() -> colorScheme.error
-        else -> {
-            colorScheme.surfaceVariant
 
-        }
-    }
 
     // Share intent helper — opens the system share sheet (WhatsApp, Gmail, etc.)
     fun shareMotivation() {
         val shareText = buildString {
-            append("${motivation.emoji} ${motivation.tone} \n\n")
+            append("${mapToneToEmoji(motivation.tone)} ${motivation.tone} \n\n")
             append("\"${motivation.message}\"\n\n")
             append("— Sent via Ai Motivation App")
         }
@@ -95,14 +103,33 @@ fun MotivationCard(motivation: RecentMotivation) {
         context.startActivity(Intent.createChooser(intent, "Share motivation via…"))
     }
 
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 20.dp),
+//        shape = RoundedCornerShape(24.dp),
+//        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+//    ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp)
+            .border(
+                width = 1.2.dp,
+                brush = Brush.linearGradient(
+                    listOf(
+                        accentPrimary.copy(alpha = 0.7f),
+                        accentPrimary.copy(alpha = 0.2f)
+                    )
+                ),
+                shape = RoundedCornerShape(24.dp)
+            ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
+    ){
         Column(modifier = Modifier.fillMaxWidth()) {
 
             // Top accent strip
@@ -115,7 +142,7 @@ fun MotivationCard(motivation: RecentMotivation) {
                             colors = listOf(accentPrimary, accentPrimary.copy(alpha = 0.3f)),
                         )
                     )
-                    .clickable{
+                    .clickable {
 
                         // TODO Navigate to the Create motivation screen
 
@@ -124,7 +151,7 @@ fun MotivationCard(motivation: RecentMotivation) {
 
             Column(modifier = Modifier.padding(18.dp)) {
 
-                // Tone badge + time
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -141,7 +168,7 @@ fun MotivationCard(motivation: RecentMotivation) {
                                 .background(accentContainer),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text(motivation.emoji, fontSize = 16.sp)
+                            Text(mapToneToEmoji(motivation.tone), fontSize = 16.sp)
                         }
                         Surface(shape = RoundedCornerShape(8.dp), color = accentContainer) {
                             Text(
@@ -169,7 +196,10 @@ fun MotivationCard(motivation: RecentMotivation) {
                             .clip(RoundedCornerShape(2.dp))
                             .background(
                                 Brush.verticalGradient(
-                                    colors = listOf(accentPrimary, accentPrimary.copy(alpha = 0.2f)),
+                                    colors = listOf(
+                                        accentPrimary,
+                                        accentPrimary.copy(alpha = 0.2f)
+                                    ),
                                 )
                             ),
                     )
@@ -201,33 +231,20 @@ fun MotivationCard(motivation: RecentMotivation) {
                 ) {
                     // Team + sender info
                     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
-                            Icon(Icons.Outlined.Group, null, modifier = Modifier.size(13.dp), tint = colorScheme.onSurfaceVariant)
+
+
+                            Text(
+                                formatTime(motivation.time),
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                color = colorScheme.onSurface,
+                            )
                         }
-
-
-//                        Row(
-//                            verticalAlignment = Alignment.CenterVertically,
-//                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-//                        ) {
-//                            Box(
-//                                modifier = Modifier
-//                                    .size(16.dp)
-//                                    .clip(CircleShape)
-//                                    .background(accentPrimary.copy(alpha = 0.15f)),
-//                                contentAlignment = Alignment.Center,
-//                            ) {
-//                                Icon(Icons.Outlined.Person, null, modifier = Modifier.size(10.dp), tint = accentPrimary)
-//                            }
-//                            Text(
-//                                "Rohan Rajesh",
-//                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-//                                color = accentPrimary,
-//                            )
-//                        }
                     }
 
                     // Share button
@@ -257,46 +274,22 @@ fun MotivationCard(motivation: RecentMotivation) {
     }
 }
 
+fun formatTime(timestamp: Timestamp?): String {
+    return timestamp?.toDate()?.let {
+        SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault()).format(it)
+    } ?: ""
+}
 
-@Composable
-fun ToneChip(
-    tone: MotivationTone,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val containerColor =
-        if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-    val contentColor =
-        if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    val borderMod = if (selected) Modifier.border(
-        1.5.dp,
-        MaterialTheme.colorScheme.primary,
-        RoundedCornerShape(14.dp)
-    ) else Modifier
+fun mapToneToEmoji(tone: String): String {
+    return when (tone) {
 
-    Surface(
-        modifier = modifier
-            .then(borderMod)
-            .clip(RoundedCornerShape(14.dp))
-            .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
-        color = containerColor,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(tone.emoji, fontSize = 22.sp)
-            Spacer(Modifier.height(4.dp))
-            Text(
-                tone.label,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                color = contentColor,
-                textAlign = TextAlign.Center
-            )
+        ToneColor.Friendly.toString() -> "😊"
+        ToneColor.Encouraging.toString() -> "💪"
+        ToneColor.Uplifting.toString() -> "🔥"
+        ToneColor.Positive.toString() -> "⚡"
+        ToneColor.Motivational.toString() -> "💡"
+        else -> {
+            "✨"
         }
     }
 }

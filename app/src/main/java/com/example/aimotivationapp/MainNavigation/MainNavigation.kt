@@ -1,5 +1,7 @@
 package com.example.aimotivationapp.MainNavigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -25,7 +27,9 @@ import com.example.aimotivationapp.Screens.GenerateMotivation.CreateMotivationSc
 import com.example.aimotivationapp.Screens.HomeScreens.FacultyScreen
 import com.example.aimotivationapp.Screens.HomeScreens.TeamHeadScreen
 import com.example.aimotivationapp.Screens.MotivationSplashScreen
+import com.example.aimotivationapp.Screens.SettingsScreen
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun MainNavigation() {
 
@@ -79,7 +83,9 @@ fun MainNavigation() {
                 TeamHeadLoginScreen(backStack)
             }
 
-
+            entry<SettingsScreen> {
+                SettingsScreen(backStack)
+            }
         }
     )
 }

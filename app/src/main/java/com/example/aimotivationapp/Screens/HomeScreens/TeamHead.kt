@@ -1,5 +1,7 @@
 package com.example.aimotivationapp.Screens.HomeScreens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,10 +57,15 @@ import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
 import com.example.aimotivationapp.MainNavigation.CreateMotivation
 import com.example.aimotivationapp.MainNavigation.LoginScreen
+import com.example.aimotivationapp.MainNavigation.SettingsScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.Screens.HomeScreens.Utils.DeleteConfirmationDialog
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.HeroHeader
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
-import com.example.aimotivationapp.Screens.HomeScreens.Utils.sampleMotivations
+import com.example.aimotivationapp.UploadBackend.Motivation
+
+import com.example.aimotivationapp.UploadBackend.UploadFetchMotivationQuotes
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -75,12 +82,13 @@ fun TeamHeadScreen(
         factory = PreferenceViewModelFactory(repo)
     )
 
+    val fetchingViewModel: UploadFetchMotivationQuotes = viewModel()
     val userName = viewModel.userName.collectAsState().value.toString()
-    val motivation = sampleMotivations
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val motivationList = remember { mutableStateListOf(*motivation.toTypedArray()) }
+
 
     val colorScheme = MaterialTheme.colorScheme
+    val alertDialogState = remember { mutableStateOf(false) }
+
 
     // 🔥 Responsive Setup
     val config = LocalConfiguration.current
@@ -91,6 +99,14 @@ fun TeamHeadScreen(
         screenWidth > 400 -> 32.dp   // large phones
         else -> 20.dp                // small phones
     }
+    val currentUserEmail = FirebaseAuth.getInstance()?.currentUser?.email.toString()
+    LaunchedEffect(Unit) {
+        fetchingViewModel.listenMotivations(currentUserEmail)
+    }
+    var selectedMotivation by remember { mutableStateOf<Motivation?>(null) }
+
+    val fetchedMotivation = fetchingViewModel.motivations.value
+
 
     val contentMaxWidth = if (screenWidth > 600) 700.dp else Dp.Unspecified
 
@@ -114,15 +130,12 @@ fun TeamHeadScreen(
                 contentPadding = PaddingValues(bottom = 48.dp),
             ) {
 
-                // ── Header
+
                 item {
                     HeroHeader(
                         userName = userName,
                         onSettings = {
-                            firebaseAuth.signOut()
-                            viewModel.clearData()
-                            mainNavigation.add(LoginScreen)
-                            mainNavigation.remove(TeamHeadScreen)
+                            mainNavigation.add(SettingsScreen)
                         },
                         onCreateMotivation = {
                             mainNavigation.add(CreateMotivation)
@@ -157,7 +170,7 @@ fun TeamHeadScreen(
                             color = colorScheme.primaryContainer
                         ) {
                             Text(
-                                "${motivationList.size}",
+                                "${fetchedMotivation.size}",
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = colorScheme.onPrimaryContainer
@@ -167,7 +180,7 @@ fun TeamHeadScreen(
                 }
 
                 // ── Empty state
-                if (motivationList.isEmpty()) {
+                if (fetchedMotivation.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier
@@ -186,20 +199,51 @@ fun TeamHeadScreen(
                             }
                         }
                     }
-                }
 
+
+                }
                 // TODO ADD Firebase stuff
-                // ── Motivation cards
-                items(motivationList, key = { it.id }) { motivation ->
-
-//                    Spacer(Modifier.height(12.dp))
-
+                items(
+                    items = fetchedMotivation,
+                    key = { it.id }
+                ) { motivation ->
+                    Spacer(Modifier.padding(12.dp))
+                    // TODO SWIPE TO DELETE CARD
                     SwipeToDeleteWrapper(
-                        onDelete = { motivationList.remove(motivation) }
+                        onDelete = {
+                            selectedMotivation = motivation
+                            alertDialogState.value = true
+                        }
                     ) {
+
                         MotivationCard(motivation)
+
                     }
+
+
                 }
+
+
+            }
+            selectedMotivation?.let { items ->
+
+                DeleteConfirmationDialog(
+                    isVisible = true,
+                    onDismiss = { selectedMotivation = null },
+                    onConfirm = {
+
+                        fetchingViewModel.deleteMotivation(
+                            currentUserEmail,
+                            docId = items.id,
+                            onSuccess = {
+                                selectedMotivation = null
+                            },
+                            onFailure = {
+                                Log.d("DeleteMotivation", it)
+                            }
+                        )
+                    }
+                )
             }
         }
     }
@@ -226,7 +270,7 @@ private fun SwipeToDeleteWrapper(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
                 onDelete()
-                true
+                false
             } else false
         },
         positionalThreshold = { totalDistance -> totalDistance * 0.4f },
