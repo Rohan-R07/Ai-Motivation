@@ -91,6 +91,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.aimotivationapp.MainNavigation.SettingsScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.ToneColor
@@ -358,11 +359,12 @@ fun FacultyScreen(
                         cardRadius = cardRadius,
                         totalQuotes = fetchedMotivationQuotes.size,
                         onSettings = {
+//                            firebaseAuth.signOut()
+//                            viewModel.clearData()
+//                            mainBackStack.add(LoginScreen)
+//                            mainBackStack.remove(FacultyScreen)
 
-                            firebaseAuth.signOut()
-                            viewModel.clearData()
-                            mainBackStack.add(LoginScreen)
-                            mainBackStack.remove(FacultyScreen)
+                            mainBackStack.add(SettingsScreen(isHead = false))
                         }
                     )
                 }
@@ -505,7 +507,7 @@ fun FacultyScreen(
                         items = filteredQuotes,
 
                     ) { quote ->
-                        Spacer(Modifier.padding(4.dp))
+                        Spacer(Modifier.padding(10.dp))
                         MotivationCard(
                             motivation = quote
                         )

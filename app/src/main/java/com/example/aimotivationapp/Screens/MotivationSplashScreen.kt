@@ -174,28 +174,6 @@ fun MotivationSplashScreen(
             }
         }
 
-
-//        coroutineScope.launch {
-//
-//            delay(3000)
-//
-//            if (isUserLoggedIn) {
-////                if (theEnterEmail == "null") {
-//                if (isUserPresent.value) {
-//                    mainNavBackStack.add(TeamHeadScreen)
-//                    mainNavBackStack.remove(SplashScreen)
-//                    isUserPresent.value = false
-//
-//                } else {
-//                    mainNavBackStack.add(FacultyScreen)
-//                    mainNavBackStack.remove(SplashScreen)
-//                    isUserPresent.value = false
-//
-//                }
-//            } else {
-//
-//            }
-//        }
     }
 
     Box(

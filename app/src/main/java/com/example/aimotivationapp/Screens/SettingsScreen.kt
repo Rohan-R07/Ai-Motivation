@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -44,7 +43,8 @@ import com.google.firebase.auth.FirebaseAuth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    mainBackStack: SnapshotStateList<Any>
+    mainBackStack: SnapshotStateList<Any>,
+    isHead: Boolean
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
@@ -55,6 +55,8 @@ fun SettingsScreen(
     val viewModel: PreferenceSavingViewModel = viewModel(
         factory = PreferenceViewModelFactory(repo)
     )
+
+    val isHeadEmail = viewModel.userEmail.collectAsState().value
 
     val userName = viewModel.userName.collectAsState().value.toString()
     val userEmail = firebaseAuth.currentUser?.email ?: "No email found"
@@ -138,7 +140,19 @@ fun SettingsScreen(
                     onClick = {}
                 )
             }
+            SettingsDivider()
+            if (!isHead) {
 
+                SettingsCard(cardRadius = cardRadius) {
+                    SettingsTile(
+                        icon = Icons.Outlined.Email,
+                        title = "Head Email",
+                        subtitle = isHeadEmail,
+                        isCompact = isCompact,
+                        onClick = {}
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── Privacy & Support Section ─────────────────────
@@ -336,7 +350,7 @@ fun SettingsCard(
 fun SettingsTile(
     icon: ImageVector,
     title: String,
-    subtitle: String,
+    subtitle: String?,
     isCompact: Boolean = false,
     onClick: () -> Unit
 ) {
@@ -381,13 +395,15 @@ fun SettingsTile(
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                fontSize = if (isCompact) 11.sp else 13.sp,
-                color = colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    fontSize = if (isCompact) 11.sp else 13.sp,
+                    color = colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
     }

@@ -5,24 +5,9 @@ import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import org.json.JSONObject
 import kotlin.collections.emptyList
 
-fun cleanJson(response: String): String {
-    return response
-        .replace("```json", "")
-        .replace("```", "")
-        .trim()
-}
 
-//fun parseMotivations(response: String): List<String> {
-//
-//    val clean = cleanJson(response)
-//
-//    val jsonObject = JSONObject(clean)
-//    val jsonArray = jsonObject.getJSONArray("motivations")
-//
-//    return List(jsonArray.length()) { index ->
-//        jsonArray.getString(index)
-//    }
-//}
+
+
 
 fun parseMotivations(rawJson: String): List<RecentMotivation> {
     return try {

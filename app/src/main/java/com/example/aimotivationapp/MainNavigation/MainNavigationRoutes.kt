@@ -26,7 +26,7 @@ data object TeamHeadLoginScreen
 data object CreateMotivation
 
 @Serializable
-data object SettingsScreen
+data class SettingsScreen(val isHead: Boolean)
 
 
 //}

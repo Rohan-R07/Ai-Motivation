@@ -135,7 +135,7 @@ fun TeamHeadScreen(
                     HeroHeader(
                         userName = userName,
                         onSettings = {
-                            mainNavigation.add(SettingsScreen)
+                            mainNavigation.add(SettingsScreen(true))
                         },
                         onCreateMotivation = {
                             mainNavigation.add(CreateMotivation)
