@@ -1092,69 +1092,6 @@ fun mapColorToTone(color: String): String {
 }
 
 
-//------------------------ Regenerate Button------------------------------------
-
-//@Composable
-//fun RegenerateButton(
-//    onClick: () -> Unit,
-//    isLoading: Boolean = false
-//) {
-//    var isPressed by remember { mutableStateOf(false) }
-//
-//    val scale by animateFloatAsState(
-//        targetValue = if (isPressed) 0.94f else 1f,
-//        animationSpec = spring(stiffness = Spring.StiffnessMedium),
-//        label = "regenScale"
-//    )
-//
-//    // Spin animation while regenerating
-//    val infiniteTransition = rememberInfiniteTransition(label = "spin")
-//    val rotation by infiniteTransition.animateFloat(
-//        initialValue = 0f,
-//        targetValue = if (isLoading) 360f else 0f,
-//        animationSpec = infiniteRepeatable(
-//            animation = tween(800, easing = LinearEasing),
-//            repeatMode = RepeatMode.Restart
-//        ),
-//        label = "rotation"
-//    )
-//
-//    Button(
-//        onClick = {
-//            if (!isLoading) {
-//                isPressed = true
-//                onClick()
-//                isPressed = false
-//            }
-//        },
-//        shape = RoundedCornerShape(50),
-//        colors = ButtonDefaults.buttonColors(
-//            containerColor = Color.White.copy(alpha = 0.22f),
-//            contentColor = Color.White
-//        ),
-//        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-//        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
-//        modifier = Modifier
-//            .shadow(16.dp, RoundedCornerShape(50))
-//            .graphicsLayer { scaleX = scale; scaleY = scale }
-//    ) {
-//        Icon(
-//            imageVector = Icons.Default.Refresh,
-//            contentDescription = "Regenerate",
-//            modifier = Modifier
-//                .size(15.dp)
-//                .graphicsLayer { rotationZ = if (isLoading) rotation else 0f },
-//            tint = Color.White
-//        )
-//        Spacer(Modifier.width(8.dp))
-//        Text(
-//            text = if (isLoading) "Regenerating..." else "Regenerate",
-//            fontWeight = FontWeight.Bold,
-//            fontSize = 14.sp,
-//            letterSpacing = 0.3.sp
-//        )
-//    }
-//}
 @Composable
 fun RegenerateButton(
     onClick: () -> Unit,

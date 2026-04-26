@@ -83,8 +83,8 @@ fun MainNavigation() {
                 TeamHeadLoginScreen(backStack)
             }
 
-            entry<SettingsScreen> {
-                SettingsScreen(backStack)
+            entry<SettingsScreen> { key ->
+                SettingsScreen(backStack,key.isHead)
             }
         }
     )
