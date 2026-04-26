@@ -33,6 +33,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +54,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun MotivationCard(motivation: Motivation) {
+fun MotivationCard(motivation: Motivation,onClick:() -> Unit) {
     val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
 
@@ -103,15 +107,6 @@ fun MotivationCard(motivation: Motivation) {
         context.startActivity(Intent.createChooser(intent, "Share motivation via…"))
     }
 
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(horizontal = 20.dp),
-//        shape = RoundedCornerShape(24.dp),
-//        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-//    ) {
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +120,8 @@ fun MotivationCard(motivation: Motivation) {
                     )
                 ),
                 shape = RoundedCornerShape(24.dp)
-            ),
+            )
+            .clickable{onClick()},
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),

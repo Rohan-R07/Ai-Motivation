@@ -34,9 +34,11 @@ import com.example.aimotivationapp.Datastore.PreferenceSavingViewModel
 import com.example.aimotivationapp.Datastore.PreferenceViewModelFactory
 import com.example.aimotivationapp.Datastore.UserPreferences
 import com.example.aimotivationapp.Datastore.UserRepository
+import com.example.aimotivationapp.MainNavigation.FacultyScreen
 import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.example.aimotivationapp.MainNavigation.SettingsScreen
 import com.example.aimotivationapp.MainNavigation.TeamHeadScreen
+import com.example.aimotivationapp.Screens.HomeScreens.FacultyScreen
 import com.google.firebase.auth.FirebaseAuth
 
 // ─── Main Settings Screen ─────────────────────────────────────
@@ -232,7 +234,14 @@ fun SettingsScreen(
                 firebaseAuth.signOut()
                 mainBackStack.add(LoginScreen)
                 mainBackStack.remove(SettingsScreen)
+
+                if (isHead){
                 mainBackStack.remove(TeamHeadScreen)
+                }
+                else{
+                    mainBackStack.remove(FacultyScreen)
+
+                }
             }
         )
     }

@@ -1,5 +1,7 @@
 package com.example.aimotivationapp.Screens.HomeScreens
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,25 +18,38 @@ import com.example.aimotivationapp.MainNavigation.LoginScreen
 import com.google.firebase.auth.FirebaseAuth
 
 import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseInQuart
+import androidx.compose.animation.core.EaseOutQuart
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -90,9 +105,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.example.aimotivationapp.MainNavigation.SettingsScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationCard
+import com.example.aimotivationapp.Screens.HomeScreens.Utils.MotivationDetailFullScreen
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import com.example.aimotivationapp.Screens.HomeScreens.Utils.ToneColor
 import com.example.aimotivationapp.UploadBackend.Motivation
@@ -117,19 +134,6 @@ private fun hClass(h: Dp) = when {
     h < 800.dp -> SClass.MEDIUM
     else -> SClass.EXPANDED
 }
-
-// ─── Tone / Category Helpers ─────────────────────────────────────
-//private fun toneIcon(tone: String): ImageVector = when (tone) {
-//    "All" -> Icons.Rounded.Category
-//    "Success" -> Icons.Rounded.EmojiEvents
-//    "Growth" -> Icons.Rounded.TrendingUp
-//    "Leadership" -> Icons.Rounded.Star
-//    "Perseverance" -> Icons.Rounded.LocalFireDepartment
-//    "Creativity" -> Icons.Rounded.AutoAwesome
-//    "Wisdom" -> Icons.Rounded.Psychology
-//    "Focus" -> Icons.Rounded.School
-//    else -> Icons.Rounded.Notes
-//}
 
 private fun toneColor(tone: String): Color = when (tone) {
     "Success" -> Color(0xFFFFB300)
@@ -198,331 +202,339 @@ private fun QuoteMark(
     }
 }
 
-
-// ═══════════════════════════════════════════════════════════════════
-// ═══  FACULTY SCREEN  ═════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FacultyScreen(
-    mainBackStack: SnapshotStateList<Any>,
-) {
-    val context = LocalContext.current
-    val repo = remember {
-        UserRepository(UserPreferences(context))
-    }
-
-    val viewModel: PreferenceSavingViewModel = viewModel(
-        factory = PreferenceViewModelFactory(repo)
-    )
-
-    val userName = viewModel.userName.collectAsState().value.toString()
-
-
-    val firebaseAuth = FirebaseAuth.getInstance()
-
-    val fetchMotivationQuotesVM: UploadFetchMotivationQuotes = viewModel()
-
-    val headEmail = viewModel.userEmail.collectAsState().value.toString()
-
-    fetchMotivationQuotesVM.listenMotivations(headEmail)
-
-    val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
-
-
-    val cs = MaterialTheme.colorScheme
-    val cfg = LocalConfiguration.current
-    val sw = cfg.screenWidthDp.dp
-    val sh = cfg.screenHeightDp.dp
-    val wc = wClass(sw)
-    val hc = hClass(sh)
-
-    val scope = rememberCoroutineScope()
-    val snackbar = remember { SnackbarHostState() }
-    val listState = rememberLazyListState()
-    val ptrState = rememberPullToRefreshState()
-
-    // ── Dimensions ───────────────────────────────────────────────
-    val hPad = when (wc) {
-        SClass.COMPACT -> 16.dp
-        SClass.MEDIUM -> 22.dp
-        SClass.EXPANDED -> 32.dp
-    }
-    val headerH = when (hc) {
-        SClass.COMPACT -> 160.dp
-        SClass.MEDIUM -> 200.dp
-        SClass.EXPANDED -> 230.dp
-    }
-    val cardRadius = when (wc) {
-        SClass.COMPACT -> 18.dp
-        SClass.MEDIUM -> 22.dp
-        SClass.EXPANDED -> 26.dp
-    }
-    val qFontSize = when (wc) {
-        SClass.COMPACT -> 14.sp
-        SClass.MEDIUM -> 15.sp
-        SClass.EXPANDED -> 17.sp
-    }
-    val iconSz = when (wc) {
-        SClass.COMPACT -> 20.dp
-        SClass.MEDIUM -> 22.dp
-        SClass.EXPANDED -> 24.dp
-    }
-    val avatarSz = when (wc) {
-        SClass.COMPACT -> 46.dp
-        SClass.MEDIUM -> 54.dp
-        SClass.EXPANDED -> 62.dp
-    }
-    val gap = when (hc) {
-        SClass.COMPACT -> 12.dp
-        SClass.MEDIUM -> 16.dp
-        SClass.EXPANDED -> 20.dp
-    }
-
-    // ── State ────────────────────────────────────────────────────
-    var isLoading by remember { mutableStateOf(true) }
-    var isRefreshing by remember { mutableStateOf(false) }
-    var selTone by remember { mutableStateOf("All") }
-    var showFilters by remember { mutableStateOf(true) }
-
-    val quotes = remember { mutableStateListOf<Motivation>() }
-
-    val tones = listOf(
-        "All", "Friendly", "Encouraging", "Positive",
-        "Uplifting", "Motivational"
-    )
-
-    val filtered by remember(quotes, selTone) {
-        derivedStateOf {
-            if (selTone == "All") quotes.toList()
-            else quotes.filter { it.tone == selTone }
-        }
-    }
-    var selectedMotivation by remember { mutableStateOf<Motivation?>(null) }
-
-
-    // ── Load
-    fun loadQuotes(initial: Boolean = false) {
-        scope.launch {
-            if (initial) isLoading = true else isRefreshing = true
-            delay(900)
-            val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
-            val sortedList = fetchedMotivationQuotes.toList().sortedBy { it.tone }
-
-            quotes.clear()
-            quotes.addAll(sortedList)
-            isLoading = false
-            isRefreshing = false
-        }
-    }
-
-    LaunchedEffect(Unit) { loadQuotes(initial = true) }
-
-    // ── UI ───────────────────────────────────────────────────────
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackbar) },
-        contentWindowInsets = WindowInsets(0)
-    ) { pad ->
-
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = {
-                scope.launch {
-                    loadQuotes()
-                    snackbar.showSnackbar(
-                        "Refreshed!",
-                        withDismissAction = true,
-                        duration = SnackbarDuration.Short
-                    )
-                }
-            },
-            state = ptrState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(pad)
-        ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(cs.background),
-                contentPadding = PaddingValues(bottom = 32.dp)
-            ) {
-
-                // ── Hero Header ───────────────────────────────────
-                item {
-                    FacultyHeader(
-                        userName = userName,
-                        headerH = headerH,
-                        avatarSz = avatarSz,
-                        cardRadius = cardRadius,
-                        totalQuotes = fetchedMotivationQuotes.size,
-                        onSettings = {
-//                            firebaseAuth.signOut()
-//                            viewModel.clearData()
-//                            mainBackStack.add(LoginScreen)
-//                            mainBackStack.remove(FacultyScreen)
-
-                            mainBackStack.add(SettingsScreen(isHead = false))
-                        }
-                    )
-                }
-
-                // ── Section Title + Filter Toggle ─────────────────
-                item {
-                    Spacer(Modifier.height(gap))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = hPad),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = "Motivation Feed",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = cs.onBackground
-                                )
-                            )
-                            Text(
-                                text = "${fetchedMotivationQuotes.size} quotes",
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = cs.onSurface.copy(alpha = 0.5f)
-                                )
-                            )
-                        }
-
-                        Surface(
-                            onClick = { showFilters = !showFilters },
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (selTone != "All") cs.primaryContainer
-                            else cs.surfaceVariant,
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Rounded.FilterList,
-                                    contentDescription = "Filter",
-                                    tint = if (selTone != "All")
-                                        cs.onPrimaryContainer
-                                    else cs.onSurfaceVariant,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // ── Filter Chips ──────────────────────────────────
-                if (showFilters) {
-                    item {
-                        LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp),
-                            contentPadding = PaddingValues(horizontal = hPad),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            itemsIndexed(tones) { _, tone ->
-                                FilterChip(
-                                    selected = selTone == tone,
-                                    onClick = { selTone = tone },
-                                    label = {
-                                        Text(
-                                            tone,
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                    },
-                                    leadingIcon = if (selTone == tone) {
-                                        {
-
-                                        }
-                                    } else null,
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = cs.primaryContainer,
-                                        selectedLabelColor = cs.onPrimaryContainer,
-                                        selectedLeadingIconColor = cs.onPrimaryContainer
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-
-
-
-                item { Spacer(Modifier.height(gap)) }
-
-                // ── Loading ───────────────────────────────────────
-                if (isLoading) {
-                    item {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(300.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
-                            ) {
-                                CircularProgressIndicator(
-                                    color = cs.primary,
-                                    strokeWidth = 3.dp,
-                                    modifier = Modifier.size(44.dp)
-                                )
-                                Text(
-                                    "Fetching quotes…",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = cs.onSurface.copy(alpha = 0.55f)
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-
-                val filteredQuotes = if (selTone == "All") {
-                    fetchedMotivationQuotes
-                } else {
-                    fetchedMotivationQuotes.filter { it.tone == selTone}
-                }
-                // ── Empty ─────────────────────────────────────────
-                if (!isLoading && filtered.isEmpty()) {
-                    item {
-                        EmptyState(
-                            tone = selTone,
-                            onReset = { selTone = "All" },
-                            hPad = hPad
-                        )
-                    }
-                }
-
-                // ── Quote Cards ───────────────────────────────────
-                if (!isLoading && filtered.isNotEmpty()) {
-                    items(
-                        items = filteredQuotes,
-
-                    ) { quote ->
-                        Spacer(Modifier.padding(10.dp))
-                        MotivationCard(
-                            motivation = quote
-                        )
-
-                        selectedMotivation = quote
-
-
-                    }
-                }
-            }
-        }
-    }
-}
-
-// FACULTY HEADER
+//
+//
+//// ═══════════════════════════════════════════════════════════════════
+//// ═══  FACULTY SCREEN  ═════════════════════════════════════════════
+//// ═══════════════════════════════════════════════════════════════════
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun FacultyScreen(
+//    mainBackStack: SnapshotStateList<Any>,
+//) {
+//    val context = LocalContext.current
+//    val repo = remember {
+//        UserRepository(UserPreferences(context))
+//    }
+//
+//    val viewModel: PreferenceSavingViewModel = viewModel(
+//        factory = PreferenceViewModelFactory(repo)
+//    )
+//
+//    val userName = viewModel.userName.collectAsState().value.toString()
+//
+//
+//    val firebaseAuth = FirebaseAuth.getInstance()
+//
+//    val fetchMotivationQuotesVM: UploadFetchMotivationQuotes = viewModel()
+//
+//    val headEmail = viewModel.userEmail.collectAsState().value.toString()
+//
+//    fetchMotivationQuotesVM.listenMotivations(headEmail)
+//
+//    val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
+//
+//
+//    val cs = MaterialTheme.colorScheme
+//    val cfg = LocalConfiguration.current
+//    val sw = cfg.screenWidthDp.dp
+//    val sh = cfg.screenHeightDp.dp
+//    val wc = wClass(sw)
+//    val hc = hClass(sh)
+//
+//    val scope = rememberCoroutineScope()
+//    val snackbar = remember { SnackbarHostState() }
+//    val listState = rememberLazyListState()
+//    val ptrState = rememberPullToRefreshState()
+//
+//    // ── Dimensions ───────────────────────────────────────────────
+//    val hPad = when (wc) {
+//        SClass.COMPACT -> 16.dp
+//        SClass.MEDIUM -> 22.dp
+//        SClass.EXPANDED -> 32.dp
+//    }
+//    val headerH = when (hc) {
+//        SClass.COMPACT -> 160.dp
+//        SClass.MEDIUM -> 200.dp
+//        SClass.EXPANDED -> 230.dp
+//    }
+//    val cardRadius = when (wc) {
+//        SClass.COMPACT -> 18.dp
+//        SClass.MEDIUM -> 22.dp
+//        SClass.EXPANDED -> 26.dp
+//    }
+//    val qFontSize = when (wc) {
+//        SClass.COMPACT -> 14.sp
+//        SClass.MEDIUM -> 15.sp
+//        SClass.EXPANDED -> 17.sp
+//    }
+//    val iconSz = when (wc) {
+//        SClass.COMPACT -> 20.dp
+//        SClass.MEDIUM -> 22.dp
+//        SClass.EXPANDED -> 24.dp
+//    }
+//    val avatarSz = when (wc) {
+//        SClass.COMPACT -> 46.dp
+//        SClass.MEDIUM -> 54.dp
+//        SClass.EXPANDED -> 62.dp
+//    }
+//    val gap = when (hc) {
+//        SClass.COMPACT -> 12.dp
+//        SClass.MEDIUM -> 16.dp
+//        SClass.EXPANDED -> 20.dp
+//    }
+//    var selectedMotivationAnimation by remember { mutableStateOf<Motivation?>(null) }
+//
+//    // ── State ────────────────────────────────────────────────────
+//    var isLoading by remember { mutableStateOf(true) }
+//    var isRefreshing by remember { mutableStateOf(false) }
+//    var selTone by remember { mutableStateOf("All") }
+//    var showFilters by remember { mutableStateOf(true) }
+//
+//    val quotes = remember { mutableStateListOf<Motivation>() }
+//
+//    val tones = listOf(
+//        "All", "Friendly", "Encouraging", "Positive",
+//        "Uplifting", "Motivational"
+//    )
+//
+//    val filtered by remember(quotes, selTone) {
+//        derivedStateOf {
+//            if (selTone == "All") quotes.toList()
+//            else quotes.filter { it.tone == selTone }
+//        }
+//    }
+//    var selectedMotivation by remember { mutableStateOf<Motivation?>(null) }
+//
+//
+//    // ── Load
+//    fun loadQuotes(initial: Boolean = false) {
+//        scope.launch {
+//            if (initial) isLoading = true else isRefreshing = true
+//            delay(900)
+//            val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
+//            val sortedList = fetchedMotivationQuotes.toList().sortedBy { it.tone }
+//
+//            quotes.clear()
+//            quotes.addAll(sortedList)
+//            isLoading = false
+//            isRefreshing = false
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) { loadQuotes(initial = true) }
+//
+//    // ── UI ───────────────────────────────────────────────────────
+//    Scaffold(
+//        modifier = Modifier.fillMaxSize(),
+//        snackbarHost = { SnackbarHost(snackbar) },
+//        contentWindowInsets = WindowInsets(0)
+//    ) { pad ->
+//
+//        PullToRefreshBox(
+//            isRefreshing = isRefreshing,
+//            onRefresh = {
+//                scope.launch {
+//                    loadQuotes()
+//                    snackbar.showSnackbar(
+//                        "Refreshed!",
+//                        withDismissAction = true,
+//                        duration = SnackbarDuration.Short
+//                    )
+//                }
+//            },
+//            state = ptrState,
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(pad)
+//        ) {
+//
+//
+//            LazyColumn(
+//                state = listState,
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(cs.background),
+//                contentPadding = PaddingValues(bottom = 32.dp)
+//            ) {
+//
+//                // ── Hero Header ───────────────────────────────────
+//                item {
+//                    FacultyHeader(
+//                        userName = userName,
+//                        headerH = headerH,
+//                        avatarSz = avatarSz,
+//                        cardRadius = cardRadius,
+//                        totalQuotes = fetchedMotivationQuotes.size,
+//                        onSettings = {
+////                            firebaseAuth.signOut()
+////                            viewModel.clearData()
+////                            mainBackStack.add(LoginScreen)
+////                            mainBackStack.remove(FacultyScreen)
+//
+//                            mainBackStack.add(SettingsScreen(isHead = false))
+//                        }
+//                    )
+//                }
+//
+//                // ── Section Title + Filter Toggle ─────────────────
+//                item {
+//                    Spacer(Modifier.height(gap))
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = hPad),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Column {
+//                            Text(
+//                                text = "Motivation Feed",
+//                                style = MaterialTheme.typography.titleMedium.copy(
+//                                    fontWeight = FontWeight.Bold,
+//                                    color = cs.onBackground
+//                                )
+//                            )
+//                            Text(
+//                                text = "${fetchedMotivationQuotes.size} quotes",
+//                                style = MaterialTheme.typography.bodySmall.copy(
+//                                    color = cs.onSurface.copy(alpha = 0.5f)
+//                                )
+//                            )
+//                        }
+//
+//                        Surface(
+//                            onClick = { showFilters = !showFilters },
+//                            shape = RoundedCornerShape(12.dp),
+//                            color = if (selTone != "All") cs.primaryContainer
+//                            else cs.surfaceVariant,
+//                            modifier = Modifier.size(40.dp)
+//                        ) {
+//                            Box(contentAlignment = Alignment.Center) {
+//                                Icon(
+//                                    imageVector = Icons.Rounded.FilterList,
+//                                    contentDescription = "Filter",
+//                                    tint = if (selTone != "All")
+//                                        cs.onPrimaryContainer
+//                                    else cs.onSurfaceVariant,
+//                                    modifier = Modifier.size(20.dp)
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                // ── Filter Chips ──────────────────────────────────
+//                if (showFilters) {
+//                    item {
+//                        LazyRow(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(top = 10.dp),
+//                            contentPadding = PaddingValues(horizontal = hPad),
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            itemsIndexed(tones) { _, tone ->
+//                                FilterChip(
+//                                    selected = selTone == tone,
+//                                    onClick = { selTone = tone },
+//                                    label = {
+//                                        Text(
+//                                            tone,
+//                                            style = MaterialTheme.typography.labelMedium
+//                                        )
+//                                    },
+//                                    leadingIcon = if (selTone == tone) {
+//                                        {
+//
+//                                        }
+//                                    } else null,
+//                                    colors = FilterChipDefaults.filterChipColors(
+//                                        selectedContainerColor = cs.primaryContainer,
+//                                        selectedLabelColor = cs.onPrimaryContainer,
+//                                        selectedLeadingIconColor = cs.onPrimaryContainer
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//
+//
+//                item { Spacer(Modifier.height(gap)) }
+//
+//                // ── Loading ───────────────────────────────────────
+//                if (isLoading) {
+//                    item {
+//                        Box(
+//                            Modifier
+//                                .fillMaxWidth()
+//                                .height(300.dp),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Column(
+//                                horizontalAlignment = Alignment.CenterHorizontally,
+//                                verticalArrangement = Arrangement.spacedBy(14.dp)
+//                            ) {
+//                                CircularProgressIndicator(
+//                                    color = cs.primary,
+//                                    strokeWidth = 3.dp,
+//                                    modifier = Modifier.size(44.dp)
+//                                )
+//                                Text(
+//                                    "Fetching quotes…",
+//                                    style = MaterialTheme.typography.bodyMedium.copy(
+//                                        color = cs.onSurface.copy(alpha = 0.55f)
+//                                    )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                val filteredQuotes = if (selTone == "All") {
+//                    fetchedMotivationQuotes
+//                } else {
+//                    fetchedMotivationQuotes.filter { it.tone == selTone}
+//                }
+//                // ── Empty ─────────────────────────────────────────
+//                if (!isLoading && filtered.isEmpty()) {
+//                    item {
+//                        EmptyState(
+//                            tone = selTone,
+//                            onReset = { selTone = "All" },
+//                            hPad = hPad
+//                        )
+//                    }
+//                }
+//
+//                // ── Quote Cards ───────────────────────────────────
+//                if (!isLoading && filtered.isNotEmpty()) {
+//                    items(
+//                        items = filteredQuotes,
+//
+//                    ) { quote ->
+//                        Spacer(Modifier.padding(10.dp))
+//                        MotivationCard(
+//                            motivation = quote,
+//
+//                            onClick = {
+//                                selectedMotivationAnimation = quote
+//                            },
+//                        )
+//
+//                        selectedMotivation = quote
+//
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//// FACULTY HEADER
 @Composable
 private fun FacultyHeader(
     userName: String,
@@ -756,10 +768,10 @@ private fun FacultyHeader(
     }
 }
 
-
-// ═══════════════════════════════════════════════════════════════════
-// ═══  STAT PILL  ══════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
+//
+//// ═══════════════════════════════════════════════════════════════════
+//// ═══  STAT PILL  ══════════════════════════════════════════════════
+//// ═══════════════════════════════════════════════════════════════════
 @Composable
 private fun StatPill(
     icon: ImageVector,
@@ -789,9 +801,9 @@ private fun StatPill(
 }
 
 
-// ═══════════════════════════════════════════════════════════════════
-// ═══  EMPTY STATE  ════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
+//// ═══════════════════════════════════════════════════════════════════
+//// ═══  EMPTY STATE  ════════════════════════════════════════════════
+//// ═══════════════════════════════════════════════════════════════════
 @Composable
 private fun EmptyState(
     tone: String,
@@ -876,6 +888,484 @@ private fun EmptyState(
                             fontWeight = FontWeight.Bold,
                             color = cs.onPrimaryContainer
                         )
+                    )
+                }
+            }
+        }
+    }
+}
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun FacultyScreen(
+//    mainBackStack: SnapshotStateList<Any>,
+//) {
+//    val context = LocalContext.current
+//    val repo = remember { UserRepository(UserPreferences(context)) }
+//
+//    val viewModel: PreferenceSavingViewModel = viewModel(
+//        factory = PreferenceViewModelFactory(repo)
+//    )
+//
+//    val userName = viewModel.userName.collectAsState().value.toString()
+//
+//    val fetchMotivationQuotesVM: UploadFetchMotivationQuotes = viewModel()
+//    val headEmail = viewModel.userEmail.collectAsState().value.toString()
+//
+//    // ✅ FIX: proper listener
+//    LaunchedEffect(headEmail) {
+//        fetchMotivationQuotesVM.listenMotivations(headEmail)
+//    }
+//
+//    val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
+//
+//    val cs = MaterialTheme.colorScheme
+//    val cfg = LocalConfiguration.current
+//    val sw = cfg.screenWidthDp.dp
+//    val sh = cfg.screenHeightDp.dp
+//    val wc = wClass(sw)
+//    val hc = hClass(sh)
+//
+//    val scope = rememberCoroutineScope()
+//    val snackbar = remember { SnackbarHostState() }
+//    val listState = rememberLazyListState()
+//    val ptrState = rememberPullToRefreshState()
+//
+//    val hPad = if (sw < 360.dp) 16.dp else if (sw < 600.dp) 22.dp else 32.dp
+//    val headerH = if (sh < 600.dp) 160.dp else if (sh < 800.dp) 200.dp else 230.dp
+//    val gap = if (sh < 600.dp) 12.dp else if (sh < 800.dp) 16.dp else 20.dp
+//
+//    // 🔥 FIXED STATES
+//    var selectedMotivationAnimation by remember { mutableStateOf<Motivation?>(null) }
+//    var isLoading by remember { mutableStateOf(true) }
+//    var isRefreshing by remember { mutableStateOf(false) }
+//    var selTone by remember { mutableStateOf("All") }
+//    var showFilters by remember { mutableStateOf(true) }
+//    var selectedBounds by remember { mutableStateOf<androidx.compose.ui.geometry.Rect?>(null) }
+//    val tones = listOf(
+//        "All", "Friendly", "Encouraging", "Positive",
+//        "Uplifting", "Motivational"
+//    )
+//
+//    val filteredQuotes = if (selTone == "All") {
+//        fetchedMotivationQuotes
+//    } else {
+//        fetchedMotivationQuotes.filter { it.tone == selTone }
+//    }
+//
+//    // ── Load
+//    fun loadQuotes(initial: Boolean = false) {
+//        scope.launch {
+//            if (initial) isLoading = true else isRefreshing = true
+//            delay(600)
+//            isLoading = false
+//            isRefreshing = false
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) { loadQuotes(true) }
+//
+//    // 🔥 ROOT BOX (IMPORTANT)
+//    Box(modifier = Modifier.fillMaxSize()) {
+//
+//        Scaffold(
+//            modifier = Modifier.fillMaxSize(),
+//            snackbarHost = { SnackbarHost(snackbar) },
+//            contentWindowInsets = WindowInsets(0)
+//        ) { pad ->
+//
+//            PullToRefreshBox(
+//                isRefreshing = isRefreshing,
+//                onRefresh = {
+//                    scope.launch {
+//                        loadQuotes()
+//                        snackbar.showSnackbar("Refreshed!")
+//                    }
+//                },
+//                state = ptrState,
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(pad)
+//            ) {
+//
+//                LazyColumn(
+//                    state = listState,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .background(cs.background),
+//                    contentPadding = PaddingValues(bottom = 32.dp)
+//                ) {
+//
+//                    item {
+//                        FacultyHeader(
+//                            userName = userName,
+//                            headerH = headerH,
+//                            avatarSz = 54.dp,
+//                            cardRadius = 22.dp,
+//                            totalQuotes = fetchedMotivationQuotes.size,
+//                            onSettings = {
+//                                mainBackStack.add(SettingsScreen(isHead = false))
+//                            }
+//                        )
+//                    }
+//
+//                    item {
+//                        Spacer(Modifier.height(gap))
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(horizontal = hPad),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("Motivation Feed", fontWeight = FontWeight.Bold)
+//
+//                            IconButton(onClick = {
+//                                showFilters = !showFilters
+//                            }) {
+//                                Icon(Icons.Rounded.FilterList, null)
+//                            }
+//                        }
+//                    }
+//
+//                    if (showFilters) {
+//                        item {
+//                            LazyRow(
+//                                contentPadding = PaddingValues(horizontal = hPad)
+//                            ) {
+//                                items(tones) { tone ->
+//                                    FilterChip(
+//                                        selected = selTone == tone,
+//                                        onClick = { selTone = tone },
+//                                        label = { Text(tone) }
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    item { Spacer(Modifier.height(gap)) }
+//
+//                    if (isLoading) {
+//                        item {
+//                            Box(
+//                                Modifier
+//                                    .fillMaxWidth()
+//                                    .height(300.dp),
+//                                contentAlignment = Alignment.Center
+//                            ) {
+//                                CircularProgressIndicator()
+//                            }
+//                        }
+//                    }
+//
+//                    if (!isLoading && filteredQuotes.isEmpty()) {
+//                        item {
+//                            EmptyState(
+//                                tone = selTone,
+//                                onReset = { selTone = "All" },
+//                                hPad = hPad
+//                            )
+//                        }
+//                    }
+//
+//                    if (!isLoading && filteredQuotes.isNotEmpty()) {
+//                        items(filteredQuotes, key = { it.id }) { quote ->
+//                            Spacer(Modifier.height(12.dp))
+//
+//                            MotivationCard(
+//                                motivation = quote,
+//                                onClick = {
+//                                    selectedMotivationAnimation = quote
+//                                }
+//                            )
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        val progress = animateFloatAsState(
+//            targetValue = if (selectedMotivationAnimation != null) 1f else 0f,
+//            label = "expand"
+//        ).value
+//
+//        selectedMotivationAnimation?.let { motivation ->
+//
+//            val bounds = selectedBounds ?: return@let
+//
+//            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+//            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+//
+//            val width = lerp(bounds.width.dp, screenWidth, progress)
+//            val height = lerp(bounds.height.dp, screenHeight, progress)
+//
+//            val x = lerp(bounds.left.dp, 0.dp, progress)
+//            val y = lerp(bounds.top.dp, 0.dp, progress)
+//
+//            Box(
+//                modifier = Modifier
+//                    .absoluteOffset(x = x, y = y)
+//                    .size(width, height)
+//                    .clip(RoundedCornerShape((24 * (1 - progress)).dp))
+//                    .background(cs.background)
+//            ) {
+//
+//                // 🔥 BLOCK TOUCH
+//                Box(
+//                    modifier = Modifier
+//                        .matchParentSize()
+//                        .clickable(
+//                            indication = null,
+//                            interactionSource = remember { MutableInteractionSource() }
+//                        ) {}
+//                )
+//
+//                if (progress > 0.9f) {
+//                    MotivationDetailFullScreen(
+//                        motivation = motivation,
+//                        onDismiss = {
+//                            selectedMotivationAnimation = null
+//                        }
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FacultyScreen(
+    mainBackStack: SnapshotStateList<Any>,
+) {
+    val context = LocalContext.current
+    val repo = remember { UserRepository(UserPreferences(context)) }
+
+    val viewModel: PreferenceSavingViewModel = viewModel(
+        factory = PreferenceViewModelFactory(repo)
+    )
+
+    val userName = viewModel.userName.collectAsState().value.toString()
+    val fetchMotivationQuotesVM: UploadFetchMotivationQuotes = viewModel()
+    val headEmail = viewModel.userEmail.collectAsState().value.toString()
+
+    LaunchedEffect(headEmail) {
+        fetchMotivationQuotesVM.listenMotivations(headEmail)
+    }
+
+    val fetchedMotivationQuotes = fetchMotivationQuotesVM.motivations.value
+
+    val cs = MaterialTheme.colorScheme
+    val cfg = LocalConfiguration.current
+    val sw = cfg.screenWidthDp.dp
+    val sh = cfg.screenHeightDp.dp
+
+    val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
+    val ptrState = rememberPullToRefreshState()
+
+    val hPad = if (sw < 360.dp) 16.dp else if (sw < 600.dp) 22.dp else 32.dp
+    val headerH = if (sh < 600.dp) 160.dp else if (sh < 800.dp) 200.dp else 230.dp
+    val gap = if (sh < 600.dp) 12.dp else if (sh < 800.dp) 16.dp else 20.dp
+
+    // ── State ──────────────────────────────────────────────────
+    // ✅ Same pattern as TeamHeadScreen
+    var selectedMotivationDetail by remember { mutableStateOf<Motivation?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var isRefreshing by remember { mutableStateOf(false) }
+    var selTone by remember { mutableStateOf("All") }
+    var showFilters by remember { mutableStateOf(true) }
+
+    val tones = listOf(
+        "All", "Friendly", "Encouraging", "Positive",
+        "Uplifting", "Motivational"
+    )
+
+    val filteredQuotes = if (selTone == "All") {
+        fetchedMotivationQuotes
+    } else {
+        fetchedMotivationQuotes.filter { it.tone == selTone }
+    }
+
+    fun loadQuotes(initial: Boolean = false) {
+        scope.launch {
+            if (initial) isLoading = true else isRefreshing = true
+            delay(600)
+            isLoading = false
+            isRefreshing = false
+        }
+    }
+
+    LaunchedEffect(Unit) { loadQuotes(true) }
+
+    // ── ✅ ROOT Box — everything stacks here ───────────────────
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // ── Layer 1: Main screen ───────────────────────────────
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            snackbarHost = { SnackbarHost(snackbar) },
+            contentWindowInsets = WindowInsets(0)
+        ) { pad ->
+
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = {
+                    scope.launch {
+                        loadQuotes()
+                        snackbar.showSnackbar("Refreshed!")
+                    }
+                },
+                state = ptrState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(pad)
+            ) {
+
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(cs.background),
+                    contentPadding = PaddingValues(bottom = 32.dp)
+                ) {
+
+                    // ── Header ─────────────────────────────────
+                    item {
+                        FacultyHeader(
+                            userName = userName,
+                            headerH = headerH,
+                            avatarSz = 54.dp,
+                            cardRadius = 22.dp,
+                            totalQuotes = fetchedMotivationQuotes.size,
+                            onSettings = {
+                                mainBackStack.add(SettingsScreen(isHead = false))
+                            }
+                        )
+                    }
+
+                    // ── Section title + filter toggle ──────────
+                    item {
+                        Spacer(Modifier.height(gap))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = hPad),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Motivation Feed",
+                                fontWeight = FontWeight.Bold
+                            )
+                            IconButton(onClick = { showFilters = !showFilters }) {
+                                Icon(Icons.Rounded.FilterList, contentDescription = null)
+                            }
+                        }
+                    }
+
+                    // ── Filter chips ───────────────────────────
+                    if (showFilters) {
+                        item {
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = hPad)
+                            ) {
+                                items(tones) { tone ->
+                                    FilterChip(
+                                        selected = selTone == tone,
+                                        onClick = { selTone = tone },
+                                        label = { Text(tone) }
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                }
+                            }
+                        }
+                    }
+
+                    item { Spacer(Modifier.height(gap)) }
+
+                    // ── Loading state ──────────────────────────
+                    if (isLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+                    // ── Empty state ────────────────────────────
+                    if (!isLoading && filteredQuotes.isEmpty()) {
+                        item {
+                            EmptyState(
+                                tone = selTone,
+                                onReset = { selTone = "All" },
+                                hPad = hPad
+                            )
+                        }
+                    }
+
+                    // ── Motivation cards ───────────────────────
+                    if (!isLoading && filteredQuotes.isNotEmpty()) {
+                        items(filteredQuotes, key = { it.id }) { quote ->
+                            Spacer(Modifier.height(12.dp))
+                            MotivationCard(
+                                motivation = quote,
+                                onClick = {
+                                    // ✅ Just set state — overlay outside
+                                    // Scaffold handles displaying it
+                                    selectedMotivationDetail = quote
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // ── Layer 2: Full screen detail ────────────────────────
+        // ✅ LAST child of root Box → renders ON TOP of everything
+        // ✅ Sibling of Scaffold — NOT inside it
+        AnimatedVisibility(
+            visible = selectedMotivationDetail != null,
+            enter = slideInVertically(
+                initialOffsetY = { it },
+                animationSpec = tween(480, easing = EaseOutQuart)
+            ) + fadeIn(tween(300)),
+            exit = slideOutVertically(
+                targetOffsetY = { it },
+                animationSpec = tween(380, easing = EaseInQuart)
+            ) + fadeOut(tween(250)),
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+            // 🔥 THIS BOX BLOCKS ALL TOUCHES BELOW
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+
+                    // ✅ IMPORTANT: consume ALL clicks
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { /* do nothing */ }
+            ) {
+
+                selectedMotivationDetail?.let { motivation ->
+
+                    MotivationDetailFullScreen(
+                        motivation = motivation,
+                        onDismiss = {
+                            selectedMotivationDetail = null
+                        }
                     )
                 }
             }
