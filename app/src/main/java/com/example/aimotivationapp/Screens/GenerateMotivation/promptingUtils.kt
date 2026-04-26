@@ -5,13 +5,9 @@ import com.example.aimotivationapp.Screens.HomeScreens.Utils.RecentMotivation
 import org.json.JSONObject
 import kotlin.collections.emptyList
 
-
-
-
-
 fun parseMotivations(rawJson: String): List<RecentMotivation> {
     return try {
-        // Gemini sometimes wraps response in ```json ... ```
+
         val cleaned = rawJson
             .replace("```json", "")
             .replace("```", "")

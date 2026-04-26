@@ -32,13 +32,8 @@ fun LoginScreen(mainBackstack: SnapshotStateList<Any>) {
     val firebaseAuth = FirebaseAuth.getInstance()
 
 
-//    Column(
-//        modifier = Modifier
-//            .background(MaterialTheme.colorScheme.surface)
-//            .fillMaxSize(),
-//        verticalArrangement = Arrangement.Top,
-//    ) {
-    LoginPotrait(firebaseAuth = firebaseAuth,mainBackstack)
-//    }
+
+    LoginPotrait(firebaseAuth = firebaseAuth, mainBackstack)
+
 
 }

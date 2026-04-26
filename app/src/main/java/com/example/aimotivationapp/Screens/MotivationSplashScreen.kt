@@ -215,15 +215,15 @@ fun MotivationSplashScreen(
                             shape = RoundedCornerShape(cornerRadius.dp)
                         )
                 ) {
-                    // ─────────────────────────────────────────────
+
                     // TODO: Replace Text with your logo Image below
-                    // ─────────────────────────────────────────────
+
                     // Image(
                     //     painter = painterResource(R.drawable.ic_your_logo),
                     //     contentDescription = null,
                     //     modifier = Modifier.size(44.dp)
                     // )
-                    // ─────────────────────────────────────────────
+
                     Text(
                         text = "M",
                         style = MaterialTheme.typography.headlineLarge.copy(
